@@ -37,7 +37,7 @@ class Controller {
 	}
 
 	// called after dispatch
-	public function postDispatch() {
+	public function init() {
 
 	}
 

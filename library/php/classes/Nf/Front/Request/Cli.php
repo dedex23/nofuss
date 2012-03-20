@@ -1,0 +1,24 @@
+<?php
+
+namespace Nf\Front\Request;
+
+class Cli extends AbstractRequest
+{
+
+	protected $_params=array();
+
+	public function __construct($uri) {
+		$this->_uri=$uri;
+	}
+
+	public function getUri() {
+		return $this->_uri;
+	}
+
+	public function getParams() {
+        $return       = $this->_params;
+        return $return;
+    }
+
+
+}

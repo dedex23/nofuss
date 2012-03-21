@@ -5,8 +5,10 @@ namespace App\Test;
 class IndexController extends \App\Controller {
 
 	function indexAction(){
-		echo 'index';
-
+		for($i=0; $i<500; $i++) {
+			usleep(500);
+			echo 'index';
+		}
 	}
 
 }

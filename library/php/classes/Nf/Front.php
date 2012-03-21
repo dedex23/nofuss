@@ -341,7 +341,9 @@ class Front extends Singleton {
 	// calls the actual action found from the routing system
 	public function launchAction() {
 		self::$obLevel = ob_get_level();
-        ob_start();
+        if(php_sapi_name()!='cli') {
+        	ob_start();
+        }
 
 		call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
 

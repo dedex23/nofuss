@@ -157,12 +157,16 @@ class Mysqli extends AbstractAdapter
 		}
 	}
 
-	public function multiQuery(array $queries) {
+	public function multiQuery($queries) {
 
 		$mysqli = $this->_connect();
 		$mysqli = $this->_connection;
 
-		$ret=$mysqli->multi_query(implode(';', $queries));
+		if(is_array($queries)) {
+			$queries = implode(';', $queries);
+		}
+		
+		$ret=$mysqli->multi_query($queries);
 
 		if($ret===false) {
 			throw new \Exception($mysqli->error);

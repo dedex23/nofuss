@@ -5,10 +5,13 @@ namespace Nf;
 abstract class File 
 {	
 	public static function mkdir($pathname, $mode=0775, $recursive=false){
-        $oldumask = umask(0);
-		$ret = mkdir($pathname, $mode, $recursive);
-        umask($oldumask);
-        return $ret;
+		if(!is_dir($pathname)) {
+			$oldumask = umask(0);
+			$ret = mkdir($pathname, $mode, $recursive);
+			umask($oldumask);
+			return $ret;
+		}
+        return true;
     }
 
 	public static function rename($old, $new, $mode=0775){

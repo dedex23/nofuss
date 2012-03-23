@@ -6,7 +6,6 @@ class IndexController extends \App\Controller {
 
 	function indexAction(){
 		echo 'index';
-
 	}
 
 	function testAction(){

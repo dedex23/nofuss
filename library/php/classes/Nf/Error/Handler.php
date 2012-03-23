@@ -126,9 +126,6 @@ class Handler extends \Exception
 
 	public static function displayAndLogError($str, $httpCode) {
 
-		print_r($str);
-		return;
-
 		if(\Nf\Registry::isRegistered('config')) {
 			$config=\Nf\Registry::get('config');
 			$front=\Nf\Front::getInstance();

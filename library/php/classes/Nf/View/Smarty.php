@@ -118,6 +118,8 @@ class Smarty extends View
     }
 
     public function fetch($name) {
+    	echo $name;
+    	die();
 		return $this->_smarty->fetch($name . self::FILE_EXTENSION);
 	}
 

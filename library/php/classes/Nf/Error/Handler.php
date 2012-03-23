@@ -40,12 +40,13 @@ class Handler extends \Exception
 
 	public static function handleError($errno = null, $errstr = 0, $errfile = null, $errline = null) {
 		$error_reporting=error_reporting();
-		if($error_reporting===0) {
-			return false; // developer used @ to ignore all errors
+		echo 'er=' . $error_reporting;
+		if($error_reporting==0) {
+			return true; // developer used @ to ignore all errors
 
 		}
 		if(!($error_reporting & $errno)) {
-			return false; // developer asked to ignore this error
+			return true; // developer asked to ignore this error
 		}
 		throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
 		return true;
@@ -125,10 +126,6 @@ class Handler extends \Exception
 	}
 
 	public static function displayAndLogError($str, $httpCode) {
-
-		print_r($str);
-		return;
-
 		if(\Nf\Registry::isRegistered('config')) {
 			$config=\Nf\Registry::get('config');
 			$front=\Nf\Front::getInstance();

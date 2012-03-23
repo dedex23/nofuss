@@ -128,11 +128,11 @@ class Smarty extends View
 		// configuration de Smarty
 		$this->_smarty->setTemplateDir(realpath(\Nf\Registry::get('applicationPath') . '/application/' . \Nf\Registry::get('version') . '/' . $path . '/views/'));
 		// répertoire du cache Smarty
-		$cacheDirectory = realpath(\Nf\Registry::get('applicationPath') . '/cache/smarty/' . \Nf\Registry::get('version') . '/' . \Nf\Registry::get('locale') . '/' . $path . '/');
+		$cacheDirectory = realpath(\Nf\Registry::get('applicationPath')) . '/cache/smarty/' . \Nf\Registry::get('version') . '/' . \Nf\Registry::get('locale') . '/' . $path . '/';
 		// répertoire des templates compilés
-		$compileDirectory = realpath(\Nf\Registry::get('applicationPath') . '/cache/templates_c/' . \Nf\Registry::get('version') . '/' . \Nf\Registry::get('locale') . '/' . $path . '/');
+		$compileDirectory = realpath(\Nf\Registry::get('applicationPath')) . '/cache/templates_c/' . \Nf\Registry::get('version') . '/' . \Nf\Registry::get('locale') . '/' . $path . '/';
 
-		$configDirectory = realpath(\Nf\Registry::get('applicationPath') . '/configs/' . \Nf\Registry::get('version') . '/' . \Nf\Registry::get('locale') . '/' . $path . '/');
+		$configDirectory = realpath(\Nf\Registry::get('applicationPath')) . '/configs/' . \Nf\Registry::get('version') . '/' . \Nf\Registry::get('locale') . '/' . $path . '/';
 
 		$pluginsDirectories = array(
 						realpath(\Nf\Registry::get('applicationPath') . '/plugins/'),
@@ -140,8 +140,8 @@ class Smarty extends View
 						realpath(\Nf\Registry::get('libraryPath') . '/php/classes/Smarty/plugins/')
 					);
 
-		\Nf\Common::mkdir_recursive($cacheDirectory, 0755);
-		\Nf\Common::mkdir_recursive($compileDirectory, 0755);
+		\Nf\File::mkdir($cacheDirectory, 0755, true);
+		\Nf\File::mkdir($compileDirectory, 0755, true);
 
 		$this->_smarty->setUseSubDirs(true);
 

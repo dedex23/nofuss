@@ -2,8 +2,8 @@
 
 namespace Nf;
 
-abstract class File 
-{	
+abstract class File
+{
 	public static function mkdir($pathname, $mode=0775, $recursive=false){
 		if(!is_dir($pathname)) {
 			$oldumask = umask(0);
@@ -23,7 +23,7 @@ abstract class File
         }
         return false;
     }
-	
+
 	public static function generatePath($input){
 		$input=''.$input;
 		// 15567 	=> /7/15/56/7/@/

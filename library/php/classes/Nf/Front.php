@@ -242,7 +242,7 @@ class Front extends Singleton {
 		return $foundController;
 	}
 
-	private function getControllerFilename($directory, $module, $controller) {
+	private function getControllerFilename($namespace, $directory, $module, $controller) {
 		$controllerFilename=ucfirst($controller.'Controller.php');
 		return $directory . $module . '/' . self::controllersDirectory . '/' . $controllerFilename;
 	}
@@ -251,7 +251,7 @@ class Front extends Singleton {
 		$foundController=null;
 
 		foreach($this->_moduleDirectories as $moduleDirectory=>$moduleDirectoryInfos) {
-			$controllerFilename=$this->getControllerFilename($moduleDirectoryInfos['directory'], $inModule, $inController);
+			$controllerFilename=$this->getControllerFilename($moduleDirectoryInfos['namespace'], $moduleDirectoryInfos['directory'], $inModule, $inController);
 			if(file_exists($controllerFilename)) {
 				$this->_moduleNamespace = $moduleDirectoryInfos['namespace'];
 				$this->_moduleName = $inModule;
@@ -272,7 +272,9 @@ class Front extends Singleton {
 	public function forward($module, $controller, $action) {
 		if($foundController=$this->checkModuleControllerAction($module, $controller, $action)) {
 			if($this->checkMethodForAction($foundController)) {
-				call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
+				echo 'after 1';
+				$this->launchAction();
+				echo 'after 2';
 				return true;
 			}
 			else {
@@ -325,6 +327,7 @@ class Front extends Singleton {
 		$this->_controllerInstance = new $controllerClassName($this);
 
 		$reflected = new \ReflectionClass($this->_controllerInstance);
+
 		if($reflected->hasMethod($this->_actionName . 'Action')) {
 			return true;
 		}
@@ -342,13 +345,13 @@ class Front extends Singleton {
 	public function launchAction() {
 		self::$obLevel = ob_get_level();
         if(php_sapi_name()!='cli') {
-        	ob_start();
+        	// ob_start();
         }
 
 		call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
 
-		$content = ob_get_clean();
-        $this->_response->addBodyPart($content);
+		//$content = ob_get_clean();
+        // $this->_response->addBodyPart($content);
 	}
 
 	public static function cleanOutputBuffer() {

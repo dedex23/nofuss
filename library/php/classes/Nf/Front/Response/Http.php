@@ -46,7 +46,7 @@ class Http extends AbstractResponse
         $this->canSendHeaders();
         $this->setHeader('Location', $url, true)
              ->setHttpResponseCode($code);
-
+    	print_r($this->_headers);
         return $this;
     }
 

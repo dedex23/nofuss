@@ -32,7 +32,7 @@ class Memcached extends Session
         $sessionId = session_id();
         $cacheKey = Cache::getKeyName('session', $sessionId);
         if ($sessionId !== "") {
-        	$this->_data = $this->_memcache->get($cacheKey);
+        	self::$_data = $this->_memcache->get($cacheKey);
         }
         return true;
     }
@@ -40,20 +40,18 @@ class Memcached extends Session
     function close() {
 		$this->_lifeTime = null;
         $this->_memcache = null;
-        $this->_data = null;
+        self::$_data = null;
         return true;
     }
 
     function read($sessionId) {
-    	return $this->_data;
-        //$data = $this->_memcache->get($sessionId);
-        return $data;
+    	return self::$_data;
     }
 
     function write($sessionId, $data) {
         // This is called upon script termination or when session_write_close() is called, which ever is first.
         $cacheKey = Cache::getKeyName('session', $sessionId);
-		$result = $this->_memcache->set($cacheKey, $this->_data, false, $this->_lifeTime);
+		$result = $this->_memcache->set($cacheKey, self::$_data, false, $this->_lifeTime);
 		return $result;
     }
 

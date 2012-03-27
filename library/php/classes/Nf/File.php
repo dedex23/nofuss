@@ -24,6 +24,21 @@ abstract class File
         return false;
     }
 	
+	public static function uncompress($src, $dest, $unlink_src=false){
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$mimeType = finfo_file($finfo, $src);
+		finfo_close($finfo);
+		
+		switch($mimeType) {
+			case 'application/x-gzip':
+				exec('gzip -dcf ' . $src . ($dest!==null ? ' > '.$dest : ''), $out, $ret);
+				break;	
+		}
+		
+		if(isset($ret) && $ret===0 && $unlink_src) unlink($src);
+		return $ret;
+	}
+	
 	public static function generatePath($input){
 		$input=''.$input;
 		// 15567 	=> /7/15/56/7/@/

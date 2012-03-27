@@ -173,6 +173,36 @@ class Mysqli extends AbstractAdapter
 		}
 	}
 
+	/**
+     * Begin a transaction.
+     *
+     * @return void
+     */
+    protected function _beginTransaction() {
+        $this->_connect();
+        $this->_connection->autocommit(false);
+    }
 
+    /**
+     * Commit a transaction.
+     *
+     * @return void
+     */
+    protected function _commit() {
+        $this->_connect();
+        $this->_connection->commit();
+        $this->_connection->autocommit(true);
+    }
+
+    /**
+     * Roll-back a transaction.
+     *
+     * @return void
+     */
+    protected function _rollBack() {
+        $this->_connect();
+        $this->_connection->rollback();
+        $this->_connection->autocommit(true);
+    }
 
 }

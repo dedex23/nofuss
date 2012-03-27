@@ -20,6 +20,11 @@ abstract class AbstractAdapter
         }
         $this->_config = $config;
     }
+	
+	public function getConnection() {
+        $this->_connect();
+        return $this->_connection;
+    }
 
     public function query($sql) {
         $this->_connect();
@@ -60,11 +65,24 @@ abstract class AbstractAdapter
         }
         return $data;
     } 
+	
+	public function beginTransaction() {
+		$this->_beginTransaction();
+		return $this;
+	}
+	
+	public function commit() {
+		$this->_commit();
+		return $this;
+	}
+	
+	public function rollback() {
+		$this->_rollback();
+		return $this;
+	}
+	
 
-	public function getConnection() {
-        $this->_connect();
-        return $this->_connection;
-    }
+	
 
     protected function _quote($value) {
         if (is_int($value)) {

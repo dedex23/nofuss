@@ -126,8 +126,10 @@ class Smarty extends View
     	$config=\Nf\Registry::get('config');
 
 		// configuration de Smarty
-		$this->_smarty->setTemplateDir(realpath(\Nf\Registry::get('applicationPath') . '/application/' . \Nf\Registry::get('version') . '/' . $path . '/views/'));
-		$this->_smarty->setTemplateDir(realpath(\Nf\Registry::get('libraryPath') . '/php/application/' . \Nf\Registry::get('version') . '/' . $path . '/views/'));
+		$this->_smarty->setTemplateDir(array(
+			\Nf\Registry::get('applicationPath') . '/application/' . \Nf\Registry::get('version') . '/' . $path . '/views/',
+			\Nf\Registry::get('libraryPath') . '/php/application/' . \Nf\Registry::get('version') . '/' . $path . '/views/'
+		));
 
 		// répertoire du cache Smarty
 		$cacheDirectory = realpath(\Nf\Registry::get('applicationPath')) . '/cache/smarty/' . \Nf\Registry::get('version') . '/' . \Nf\Registry::get('locale') . '/' . $path . '/';

@@ -29,13 +29,18 @@ abstract class File
 		$mimeType = finfo_file($finfo, $src);
 		finfo_close($finfo);
 		
+		$ret = false;
 		switch($mimeType) {
 			case 'application/x-gzip':
 				exec('gzip -dcf ' . $src . ($dest!==null ? ' > '.$dest : ''), $out, $ret);
 				break;	
 		}
 		
-		if(isset($ret) && $ret===0 && $unlink_src) unlink($src);
+		if(isset($ret) && $ret===0) {
+			$ret = true;
+			if($unlink_src) 
+				unlink($src);
+		}
 		return $ret;
 	}
 	

@@ -34,6 +34,24 @@ class Http extends AbstractRequest
 		}
 	}
 
+	public function getMethod() {
+		return $_SERVER['REQUEST_METHOD'];
+	}
+
+	public function isPost() {
+        if ('POST' == $this->getMethod()) {
+            return true;
+        }
+        return false;
+    }
+
+    public function isGet() {
+        if ('GET' == $this->getMethod()) {
+            return true;
+        }
+        return false;
+    }
+
 	public function getUri() {
 		return $this->_uri;
 	}

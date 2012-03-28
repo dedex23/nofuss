@@ -113,15 +113,4 @@ class Php extends View
 
 	}
 
-	/**
-     * Set the base path for i18n labels
-     * @param  string $language
-     * @return void
-     */
-    public function setLocale($locale='fr')
-    {
-		$this->configLoad(Registry::get('applicationPath') . '/labels/' . $locale . '.ini');
-    }
-
-
 }

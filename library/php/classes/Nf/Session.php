@@ -53,5 +53,9 @@ abstract class Session extends Singleton
 		self::$_data[$key]=$value;
 	}
 
+	public static function delete($key) {
+		unset(self::$_data[$key]);
+	}
+
 
 }

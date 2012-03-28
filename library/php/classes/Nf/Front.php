@@ -272,9 +272,7 @@ class Front extends Singleton {
 	public function forward($module, $controller, $action) {
 		if($foundController=$this->checkModuleControllerAction($module, $controller, $action)) {
 			if($this->checkMethodForAction($foundController)) {
-				echo 'after 1';
 				$this->launchAction();
-				echo 'after 2';
 				return true;
 			}
 			else {

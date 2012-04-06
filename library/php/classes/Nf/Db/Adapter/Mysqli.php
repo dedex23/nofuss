@@ -107,7 +107,7 @@ class Mysqli extends AbstractAdapter
         return $this->getConnection()->affected_rows;
     }
 
-   public function insertIgnore($tableName, array $bind) {
+	public function insertIgnore($tableName, array $bind) {
 
 		$sql="INSERT IGNORE INTO " . $this->quoteIdentifier($tableName, true) . " SET ";
 		$update_fields=array();
@@ -141,6 +141,18 @@ class Mysqli extends AbstractAdapter
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
 	}
+	
+	public function delete($tableName, $where = '') {
+		
+		if($where!='') {
+			$sql="DELETE FROM " . $this->quoteIdentifier($tableName, true) . " WHERE " . $where;
+		} else {
+			$sql="TRUNCATE TABLE" . $this->quoteIdentifier($tableName, true);
+		}
+		
+		$res=$this->query($sql);
+        return $this->getConnection()->affected_rows;
+    }
 
 	function cleanConnection() {
 

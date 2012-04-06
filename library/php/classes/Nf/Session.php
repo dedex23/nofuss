@@ -20,8 +20,8 @@ abstract class Session extends Singleton
 			$sessionParams=$config->session->params;
 		}
 		$sessionHandler=self::factory($sessionHandlerName, $sessionParams, $config->session->lifetime);
-		session_set_cookie_params(0, $config->session->cookie->path, $config->session->cookie->domain, false, true);
-	    session_name($config->session->cookie->name);
+		session_name($config->session->cookie->name);
+		session_set_cookie_params(0, $config->session->cookie->path, $config->session->cookie->domain, false, true);	    
 	    session_set_save_handler(
 			array(&$sessionHandler, 'open'),
 			array(&$sessionHandler, 'close'),
@@ -31,7 +31,7 @@ abstract class Session extends Singleton
 			array(&$sessionHandler, 'gc')
 		);
 	    session_start();
-		session_regenerate_id(true);
+		//session_regenerate_id(true);
 	    Registry::set('session', $sessionHandler);
 	    return $sessionHandler;
 	}

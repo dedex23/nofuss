@@ -158,8 +158,9 @@ class Front extends Singleton {
 
 					if(file_exists($filename)) {
 						require_once($filename);
-						foreach($_routes as $route) {
-
+						for($i=count($_routes)-1; $i>=0; $i--){
+							$route=$_routes[$i];
+						
 							// tester si match, sinon on continue jusqu'à ce qu'on trouve
 							if(preg_match('#' . $route[0] . '#', $uri, $result)) {
 								// on teste la présence du module controller action indiqué dans la route

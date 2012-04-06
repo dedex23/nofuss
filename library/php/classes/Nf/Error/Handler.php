@@ -11,7 +11,8 @@ class Handler extends \Exception
 							'string' => '',
 							'number' => 0,
 							'file' => '',
-							'line' => 0
+							'line' => 0,
+							'trace'	=> ''
 							);
 
 	public static function getLastError() {
@@ -59,7 +60,8 @@ class Handler extends \Exception
 		self::$lastError['number']=0;
 		self::$lastError['file']=$exception->getFile();
 		self::$lastError['line']=$exception->getLine();
-		$str='Exception : ' . $exception->getMessage() . ' in file : ' . $exception->getFile() . ' (line ' . $exception->getLine() . ')';
+		self::$lastError['trace']=$exception->getTraceAsString();
+		$str='Exception : ' . $exception->getMessage() . ' in file : ' . $exception->getFile() . ' (line ' . $exception->getLine() . ')';		
 		self::displayAndLogError($str, 500);
 	}
 
@@ -73,6 +75,7 @@ class Handler extends \Exception
 			self::$lastError['number']=$last['type'];
 			self::$lastError['file']=$last['file'];
 			self::$lastError['line']=$last['line'];
+			self::$lastError['trace']=$last['trace'];
 			self::displayAndLogError(print_r($last, true), 500);
 		}
 	}
@@ -92,6 +95,7 @@ class Handler extends \Exception
 		self::$lastError['number']=0;
 		self::$lastError['file']='';
 		self::$lastError['line']=0;
+		self::$lastError['trace']='';
 
 		if(\Nf\Registry::isRegistered('config')) {
 			$config=\Nf\Registry::get('config');

@@ -107,7 +107,7 @@ class Mysqli extends AbstractAdapter
         return $this->getConnection()->affected_rows;
     }
 
-   public function insertIgnore($tableName, array $bind) {
+	public function insertIgnore($tableName, array $bind) {
 
 		$sql="INSERT IGNORE INTO " . $this->quoteIdentifier($tableName, true) . " SET ";
 		$update_fields=array();
@@ -141,6 +141,18 @@ class Mysqli extends AbstractAdapter
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
 	}
+	
+	public function delete($tableName, $where = '') {
+		
+		if($where!='') {
+			$sql="DELETE FROM " . $this->quoteIdentifier($tableName, true) . " WHERE " . $where;
+		} else {
+			$sql="TRUNCATE TABLE" . $this->quoteIdentifier($tableName, true);
+		}
+		
+		$res=$this->query($sql);
+        return $this->getConnection()->affected_rows;
+    }
 
 	function cleanConnection() {
 
@@ -173,6 +185,36 @@ class Mysqli extends AbstractAdapter
 		}
 	}
 
+	/**
+     * Begin a transaction.
+     *
+     * @return void
+     */
+    protected function _beginTransaction() {
+        $this->_connect();
+        $this->_connection->autocommit(false);
+    }
 
+    /**
+     * Commit a transaction.
+     *
+     * @return void
+     */
+    protected function _commit() {
+        $this->_connect();
+        $this->_connection->commit();
+        $this->_connection->autocommit(true);
+    }
+
+    /**
+     * Roll-back a transaction.
+     *
+     * @return void
+     */
+    protected function _rollBack() {
+        $this->_connect();
+        $this->_connection->rollback();
+        $this->_connection->autocommit(true);
+    }
 
 }

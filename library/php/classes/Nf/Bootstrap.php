@@ -223,6 +223,7 @@ class Bootstrap {
 
 	public function setApplicationNamespace($namespace) {
 		$this->_applicationNamespace=$namespace;
+		\Nf\Registry::set('applicationNamespace', $namespace);
 	}
 
 	public function initCliEnvironment() {
@@ -396,7 +397,7 @@ class Bootstrap {
 			$front->setStructuredRoutes();
 
 			$front->addModuleDirectory($this->_applicationNamespace, Registry::get('applicationPath') . '/application/cli/');
-			$front->addModuleDirectory('Library', Registry::get('libraryPath') . '/php/application/cli/');
+			$front->addModuleDirectory('library', Registry::get('libraryPath') . '/php/application/cli/');
 
 			$labelManager=LabelManager::getInstance();
 			$labelManager->loadLabels(Registry::get('locale'));
@@ -434,7 +435,7 @@ class Bootstrap {
 				$front->setRootRoutes(Registry::get('applicationPath') . '/routes/' . Registry::get('version') . '/' . Registry::get('locale') . '/');
 
 				$front->addModuleDirectory($this->_applicationNamespace, Registry::get('applicationPath') . '/application/' . Registry::get('version') . '/');
-				$front->addModuleDirectory('Library', Registry::get('libraryPath') . '/php/application/' . Registry::get('version') . '/');
+				$front->addModuleDirectory('library', Registry::get('libraryPath') . '/php/application/' . Registry::get('version') . '/');
 
 				$front->setSession(Session::start());
 
@@ -449,8 +450,10 @@ class Bootstrap {
 					if($testDispatch===true) {
 						if(!$request->redirectForTrailingSlash()) {
 							$front->init();
-							$front->launchAction();
-							$front->postAction();
+							if(!$front->response->isRedirect())
+								$front->launchAction();
+							if(!$front->response->isRedirect())
+								$front->postAction();
 							$response->sendResponse();
 						}
 					}

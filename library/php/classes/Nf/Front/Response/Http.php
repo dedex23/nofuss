@@ -46,10 +46,10 @@ class Http extends AbstractResponse
         $this->canSendHeaders();
         $this->setHeader('Location', $url, true)
              ->setHttpResponseCode($code);
-
-        return $this;
+		
+		return $this;
     }
-
+	
     public function isRedirect() {
         return $this->_isRedirect;
     }
@@ -126,7 +126,7 @@ class Http extends AbstractResponse
         return !$ok;
     }
 
-	public function sendHeaders() {
+	public function sendHeaders($andExit = false) {
         // Only check if we can send headers if we have headers to send
         if (count($this->_headersRaw) || count($this->_headers) || (200 != $this->_httpResponseCode)) {
             $this->canSendHeaders();
@@ -159,8 +159,12 @@ class Http extends AbstractResponse
             header('HTTP/1.1 ' . $this->_httpResponseCode);
             $httpCodeSent = true;
         }
-
-        return $this;
+		
+		if($andExit) {
+			exit;
+		} else {
+			return $this;
+		}
     }
 
 	public function cr() {

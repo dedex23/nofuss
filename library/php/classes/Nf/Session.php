@@ -6,7 +6,7 @@ abstract class Session extends Singleton
 {
 	protected static $_instance=null;
 
-	protected $_data;
+	protected static $_data=false;
 
 	public static function factory($type, $params, $lifetime) {
 		$className=get_class() . '\\' . ucfirst($type);
@@ -20,8 +20,8 @@ abstract class Session extends Singleton
 			$sessionParams=$config->session->params;
 		}
 		$sessionHandler=self::factory($sessionHandlerName, $sessionParams, $config->session->lifetime);
-		session_set_cookie_params(0, $config->session->cookie->path, $config->session->cookie->domain, false, true);
-	    session_name($config->session->cookie->name);
+		session_name($config->session->cookie->name);
+		session_set_cookie_params(0, $config->session->cookie->path, $config->session->cookie->domain, false, true);	    
 	    session_set_save_handler(
 			array(&$sessionHandler, 'open'),
 			array(&$sessionHandler, 'close'),
@@ -31,26 +31,30 @@ abstract class Session extends Singleton
 			array(&$sessionHandler, 'gc')
 		);
 	    session_start();
-		session_regenerate_id(true);
+		//session_regenerate_id(true);
 	    Registry::set('session', $sessionHandler);
 	    return $sessionHandler;
 	}
 
-	public function getData() {
-		return $this->_data;
+	public static function getData() {
+		return self::$_data;
 	}
 
-	public function __get($key) {
-		if(isset($this->_data[$key])) {
-			return $this->_data[$key];
+	public static function get($key) {
+		if(isset(self::$_data[$key])) {
+			return self::$_data[$key];
 		}
 		else {
 			return false;
 		}
 	}
 
-	public function __set($key, $value) {
-		$this->_data[$key]=$value;
+	public static function set($key, $value) {
+		self::$_data[$key]=$value;
+	}
+
+	public static function delete($key) {
+		unset(self::$_data[$key]);
 	}
 
 

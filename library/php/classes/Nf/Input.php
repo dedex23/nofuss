@@ -66,7 +66,7 @@ class Input
 	}
 
 	public function validate() {
-		$this->metaFilterAndValidate('validate');
+		return $this->metaFilterAndValidate('validate');
 	}
 
 	public function getMessages() {
@@ -110,7 +110,6 @@ class Input
 			if($metaAction=='validate') {
 				if(!isset($this->_fields[$paramName])) {
 					$this->setField($paramName, (isset($this->_params[$paramName]) ? $this->_params[$paramName] : null));
-
 				}
 				$validatorIndex=0;
 				$validators=array();
@@ -243,7 +242,7 @@ class Input
 
 	// returns the filtered value for any field given in the params
 	public function __get($paramName) {
-		return $this->_fields[$paramName];
+		return $this->_fields[$paramName]['value'];
 	}
 
 	private function is_assoc($array) {

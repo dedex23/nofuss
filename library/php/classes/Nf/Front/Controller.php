@@ -22,6 +22,9 @@ class Controller {
 			}
 			return $this->_view;
 		}
+		elseif($var=='front') {
+			return $this->_front;
+		}
 		elseif($var=='session') {
 			return $this->_front->getSession();
 		}

@@ -166,7 +166,7 @@ class Bootstrap {
 		// prevention contre l'utilisation de index.php
 		if(isset($_SERVER['REQUEST_URI']) && in_array($_SERVER['REQUEST_URI'], array('index.php','/index.php'))) {
 			header("HTTP/1.1 301 Moved Permanently");
-			header("Location: http://" . $urlIni['version'][$version]['url']);
+			header("Location: /");
 			return false;
 		}
 

@@ -65,7 +65,6 @@ class Registry extends \ArrayObject
         $instance = self::getInstance();
 
         if (!$instance->offsetExists($index)) {
-            #require_once 'Zend/Exception.php';
             throw new \Exception("No entry is registered for key '$index'");
         }
 

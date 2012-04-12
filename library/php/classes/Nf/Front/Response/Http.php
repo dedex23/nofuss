@@ -106,8 +106,7 @@ class Http extends AbstractResponse
 
     public function setHttpResponseCode($code) {
         if (!is_int($code) || (100 > $code) || (599 < $code)) {
-            // require_once 'Zend/Controller/Response/Exception.php';
-            throw new Exception('Invalid HTTP response code');
+            throw new \Exception('Invalid HTTP response code');
         }
         if ((300 <= $code) && (307 >= $code)) {
             $this->_isRedirect = true;
@@ -126,7 +125,7 @@ class Http extends AbstractResponse
         return !$ok;
     }
 
-	public function sendHeaders($andExit = false) {
+	public function sendHeaders() {
         // Only check if we can send headers if we have headers to send
         if (count($this->_headersRaw) || count($this->_headers) || (200 != $this->_httpResponseCode)) {
             $this->canSendHeaders();
@@ -160,11 +159,7 @@ class Http extends AbstractResponse
             $httpCodeSent = true;
         }
 		
-		if($andExit) {
-			exit;
-		} else {
-			return $this;
-		}
+		return $this;
     }
 
 	public function cr() {

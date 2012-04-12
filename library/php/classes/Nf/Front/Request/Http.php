@@ -37,7 +37,7 @@ class Http extends AbstractRequest
 	public function getMethod() {
 		return $_SERVER['REQUEST_METHOD'];
 	}
-
+	
 	public function isPost() {
         if ('POST' == $this->getMethod()) {
             return true;
@@ -50,6 +50,10 @@ class Http extends AbstractRequest
             return true;
         }
         return false;
+    }
+	
+	public function isXhr() {	
+        return (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest');
     }
 
 	public function getUri() {

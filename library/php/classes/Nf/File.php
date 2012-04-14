@@ -39,7 +39,7 @@ abstract class File
 		if(isset($ret) && $ret===0) {
 			$ret = true;
 			if($unlink_src) 
-				unlink($src);
+				@unlink($src);
 		}
 		return $ret;
 	}

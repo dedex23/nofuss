@@ -49,7 +49,7 @@ class Handler extends \Exception
 			return true; // developer asked to ignore this error
 		}
 		throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-		return true;
+		return false;
 	}
 
 	public static function handleException($exception) {
@@ -61,8 +61,8 @@ class Handler extends \Exception
 		self::$lastError['file']=$exception->getFile();
 		self::$lastError['line']=$exception->getLine();
 		self::$lastError['trace']=$exception->getTraceAsString();
-		$str='Exception : ' . $exception->getMessage() . ' in file : ' . $exception->getFile() . ' (line ' . $exception->getLine() . ')';		
-		self::displayAndLogError($str, 500);
+		$str='Exception : ' . $exception->getMessage() . ' in file : ' . $exception->getFile() . ' (line ' . $exception->getLine() . ')';
+		return self::displayAndLogError($str, 500);
 	}
 
 	public static function handleFatal() {
@@ -76,16 +76,16 @@ class Handler extends \Exception
 			self::$lastError['file']=$last['file'];
 			self::$lastError['line']=$last['line'];
 			self::$lastError['trace']=$last['trace'];
-			self::displayAndLogError(print_r($last, true), 500);
+			return self::displayAndLogError(print_r($last, true), 500);
 		}
 	}
 
 	public static function handleForbidden($httpCode, $friendlyMessage='') {
-		self::handleHttpError('forbidden', $httpCode, $friendlyMessage);
+		return self::handleHttpError('forbidden', $httpCode, $friendlyMessage);
 	}
 
 	public static function handleNotFound($httpCode, $friendlyMessage='') {
-		self::handleHttpError('notFound', $httpCode, $friendlyMessage);
+		return self::handleHttpError('notFound', $httpCode, $friendlyMessage);
 	}
 
 	private static function handleHttpError($type='notFound', $httpCode, $friendlyMessage='') {
@@ -151,17 +151,18 @@ class Handler extends \Exception
 									)) {
 						trigger_error($str);
 					}
-					return;
+					return true;
 				}
 			}
 			// default : display
 			$response->displayError($str);
+			return true;
 		}
 		else {
 			@header('HTTP/1.1 500 Internal Server Error');
 			print_r($str);
 			error_log($str);
-			return false;
+			return true;
 		}
 	}
 
@@ -176,7 +177,7 @@ class Handler extends \Exception
 
 			$config=\Nf\Registry::get('config');
 			if(isset($config->error->displayPHPErrors) && (strtolower($config->error->displayPHPErrors)=='off' || $config->error->displayPHPErrors==0)) {
-				ini_set('display_errors', 'Off'); // don't display the errors
+				ini_set('display_errors', 'On'); // don't display the errors
 			}
 			else {
 				ini_set('display_errors', 'On'); // don't display the errors

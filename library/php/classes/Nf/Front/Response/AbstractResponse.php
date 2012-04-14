@@ -20,7 +20,7 @@ abstract class AbstractResponse
     	$curObLevel = ob_get_level();
         if ($curObLevel > $maxObLevel) {
             do {
-                ob_get_clean();
+                ob_end_clean();
                 $curObLevel = ob_get_level();
             } while ($curObLevel > $maxObLevel);
         }
@@ -36,8 +36,9 @@ abstract class AbstractResponse
     }
 
     public function displayError($str) {
-    	$this->sendHeaders();
+    	// $this->sendHeaders();
 		echo '<pre>';
+    	echo 'erreur !';
 		debug_print_backtrace();
 		echo '</pre>';
 		// echo $str;

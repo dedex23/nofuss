@@ -136,10 +136,13 @@ class Front extends Singleton {
 	public function findRoute() {
 
 		$foundController=null;
-		$uri=$this->_request->getUri();
+		$originalUri=$this->_request->getUri();
 
-		// virer tout ce qui est après un éventuel ? qui ne doit pas être pris en compte dans l'url
-		$uri = preg_replace('/\?.*$/', '', $uri);
+		// remove everything after a '?' which is not used in the routing system
+		$uri = preg_replace('/\?.*$/', '', $originalUri);
+
+		// strip the trailing slash, also unused
+		$uri = rtrim((string) $uri, '/');
 
 		foreach($this->_routingPreference as $routingPref) {
 
@@ -160,7 +163,7 @@ class Front extends Singleton {
 						require_once($filename);
 						for($i=count($_routes)-1; $i>=0; $i--){
 							$route=$_routes[$i];
-						
+
 							// tester si match, sinon on continue jusqu'à ce qu'on trouve
 							if(preg_match('#' . $route[0] . '#', $uri, $result)) {
 								// on teste la présence du module controller action indiqué dans la route
@@ -183,7 +186,8 @@ class Front extends Singleton {
 					// on regarde si on a un fichier et une action pour le même chemin dans les répertoires des modules
 					if($foundController=$this->checkModuleControllerAction($result[1], $result[2], $result[3])) {
 						// les éventuels paramètres sont en /variable/value
-						$paramsFromUri=ltrim(preg_replace('#^(\w+)/(\w+)/(\w+)#', '', $uri), '/');
+						$paramsFromUri=ltrim(preg_replace('#^(\w+)/(\w+)/(\w+)#', '', $originalUri), '/');
+
 						// si on envoie des variables avec des /
 						if($paramsFromUri!='') {
 							if(substr_count($paramsFromUri, '/')%2==1) {
@@ -273,7 +277,7 @@ class Front extends Singleton {
 	public function forward($module, $controller, $action) {
 		if($foundController=$this->checkModuleControllerAction($module, $controller, $action)) {
 			if($this->checkMethodForAction($foundController)) {
-				$this->launchAction();
+				call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
 				return true;
 			}
 			else {
@@ -344,13 +348,11 @@ class Front extends Singleton {
 	public function launchAction() {
 		self::$obLevel = ob_get_level();
         if(php_sapi_name()!='cli') {
-        	// ob_start();
+        	ob_start();
         }
-
 		call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
-
-		//$content = ob_get_clean();
-        // $this->_response->addBodyPart($content);
+		$content = ob_get_clean();
+		$this->_response->addBodyPart($content);
 	}
 
 	public static function cleanOutputBuffer() {
@@ -358,7 +360,7 @@ class Front extends Singleton {
         $curObLevel = ob_get_level();
         if ($curObLevel > self::$obLevel) {
             do {
-                ob_get_clean();
+                ob_end_clean();
                 $curObLevel = ob_get_level();
             } while ($curObLevel > self::$obLevel);
         }

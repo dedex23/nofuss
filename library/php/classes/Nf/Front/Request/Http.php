@@ -10,6 +10,9 @@ class Http extends AbstractRequest
 	public function __construct() {
 		if(!empty($_SERVER['REDIRECT_URL'])) {
 			$uri=ltrim($_SERVER['REDIRECT_URL'], '/');
+			if(!empty($_SERVER['REDIRECT_QUERY_STRING'])) {
+				$uri.=$_SERVER['REDIRECT_QUERY_STRING'];
+			}
 		}
 		else {
 			$uri=ltrim($_SERVER['REQUEST_URI'], '/');
@@ -80,7 +83,7 @@ class Http extends AbstractRequest
 		$redirectionUrl=false;
 		$requestParams='';
 		$requestPage='/' . $this->_uri;
-		
+
 		// we don't redirect for the home page...
 		if($requestPage!='/' && mb_strpos($requestPage, '/?')!==0) {
 			// the url without the params is :
@@ -88,7 +91,7 @@ class Http extends AbstractRequest
 				$requestParams=mb_substr($requestPage, mb_strpos($requestPage, '?'), mb_strlen($requestPage) - mb_strpos($requestPage, '?'));
 				$requestPage=mb_substr($requestPage, 0, mb_strpos($requestPage, '?'));
 			}
-			
+
 			if($config->trailingSlash->needed==true) {
 				if(mb_substr($requestPage, -1, 1)!='/') {
 					$redirectionUrl='http://' . $_SERVER['HTTP_HOST'] . $requestPage . '/' . $requestParams;

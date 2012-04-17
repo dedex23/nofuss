@@ -269,7 +269,7 @@ class Front extends Singleton {
 		unset($moduleDirectory);
 		unset($moduleDirectoryInfos);
 		if(!$foundController) {
-			throw new \Exception('Controller (' . ucfirst($inModule) . '\\' . ucfirst($inController) . 'Controller) was not found in the modules directories');
+			return false;
 		}
 		return $foundController;
 	}

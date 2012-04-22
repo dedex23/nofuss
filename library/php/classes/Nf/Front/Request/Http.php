@@ -11,7 +11,7 @@ class Http extends AbstractRequest
 		if(!empty($_SERVER['REDIRECT_URL'])) {
 			$uri=ltrim($_SERVER['REDIRECT_URL'], '/');
 			if(!empty($_SERVER['REDIRECT_QUERY_STRING'])) {
-				$uri.=$_SERVER['REDIRECT_QUERY_STRING'];
+				$uri.='?'.$_SERVER['REDIRECT_QUERY_STRING'];
 			}
 		}
 		else {
@@ -40,7 +40,7 @@ class Http extends AbstractRequest
 	public function getMethod() {
 		return $_SERVER['REQUEST_METHOD'];
 	}
-	
+
 	public function isPost() {
         if ('POST' == $this->getMethod()) {
             return true;
@@ -54,9 +54,9 @@ class Http extends AbstractRequest
         }
         return false;
     }
-	
-	public function isXhr() {	
-        return (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest');
+
+	public function isXhr() {
+        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
     }
 
 	public function getUri() {

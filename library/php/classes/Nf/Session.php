@@ -30,6 +30,7 @@ abstract class Session extends Singleton
 			array(&$sessionHandler, 'destroy'),
 			array(&$sessionHandler, 'gc')
 		);
+		register_shutdown_function('session_write_close');
 	    session_start();
 		//session_regenerate_id(true);
 	    Registry::set('session', $sessionHandler);
@@ -45,7 +46,7 @@ abstract class Session extends Singleton
 			return self::$_data[$key];
 		}
 		else {
-			return false;
+			return null;
 		}
 	}
 

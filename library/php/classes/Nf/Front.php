@@ -172,8 +172,8 @@ class Front extends Singleton {
 									if(preg_match('#' . $route[0] . '#', $uri, $result)) {
 										// on teste la présence du module controller action indiqué dans la route
 										if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
-											if(isset($route[2]) && isset($result[1])) {
-												$this->associateParams($route[2], $result[1]);
+											if(isset($route[2])) {
+												$this->associateParams($route[2], $result);
 											}
 											break;
 										}
@@ -235,8 +235,8 @@ class Front extends Singleton {
 								if(preg_match('#' . $route[0] . '#', $uri, $result)) {
 									// on teste la présence du module controller action indiqué dans la route
 									if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
-										if(isset($route[2]) && isset($result[1])) {
-											$this->associateParams($route[2], $result[1]);
+										if(isset($route[2])) {
+											$this->associateParams($route[2], $result);
 										}
 										break;
 									}
@@ -315,7 +315,7 @@ class Front extends Singleton {
 		}
 		for ($refi = 0; $refi < count($refs); $refi++) {
 			if(isset($routeParams[$refi])) {
-				$this->_request->setParam($routeParams[$refi], $refs[$refi]);
+				$this->_request->setParam($routeParams[$refi], $refs[$refi+1]);
 			}
 		}
 	}

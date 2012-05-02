@@ -85,7 +85,7 @@ abstract class AbstractAdapter
 	
 
     protected function _quote($value) {
-        if (is_int($value)) {
+        if (is_int($value) || null===$value || $value instanceof \Nf\Db\Expression) {
             return $value;
         }
 		elseif (is_float($value)) {

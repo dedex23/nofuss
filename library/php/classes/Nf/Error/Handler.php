@@ -75,7 +75,7 @@ class Handler extends \Exception
 			self::$lastError['number']=$last['type'];
 			self::$lastError['file']=$last['file'];
 			self::$lastError['line']=$last['line'];
-			self::$lastError['trace']=$last['trace'];
+			self::$lastError['trace']='';
 			return self::displayAndLogError(print_r($last, true), 500);
 		}
 	}

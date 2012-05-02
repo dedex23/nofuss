@@ -97,11 +97,11 @@ class Mysqli extends AbstractAdapter
 	public function insert($tableName, array $bind) {
 
 		$sql="INSERT INTO " . $this->quoteIdentifier($tableName, true) . " SET ";
-		$update_fields=array();
+		$insertFields=array();
 		foreach($bind as $key=>$value) {
-			$update_fields[]=$this->quoteIdentifier($key) . "=" . $this->quote($value);
+			$insertFields[]=$this->quoteIdentifier($key) . "=" . $this->quote($value);
 		}
-		$sql.=" " . implode(', ', $update_fields);
+		$sql.=" " . implode(', ', $insertFields);
 
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
@@ -110,11 +110,11 @@ class Mysqli extends AbstractAdapter
 	public function insertIgnore($tableName, array $bind) {
 
 		$sql="INSERT IGNORE INTO " . $this->quoteIdentifier($tableName, true) . " SET ";
-		$update_fields=array();
+		$updateFields=array();
 		foreach($bind as $key=>$value) {
-			$update_fields[]=$this->quoteIdentifier($key) . "=" . $this->quote($value);
+			$updateFields[]=$this->quoteIdentifier($key) . "=" . $this->quote($value);
 		}
-		$sql.=" " . implode(', ', $update_fields);
+		$sql.=" " . implode(', ', $updateFields);
 
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
@@ -123,17 +123,11 @@ class Mysqli extends AbstractAdapter
 	public function update($tableName, array $bind, $where = '') {
 
 		$sql="UPDATE " . $this->quoteIdentifier($tableName, true) . " SET ";
-		$update_fields=array();
+		$updateFields=array();
 		foreach($bind as $key=>$value) {
-			if($value instanceof \Nf\Db\Expression) {
-				$update_fields[]="`" . $key . "`=" . $value;
-			}
-			else {
-				$update_fields[]="`" . $key . "`=" . $this->quote($value);
-			}
-
+			$updateFields[]=$this->quoteIdentifier($key) . "=" . $this->quote($value);
 		}
-		$sql.=" " . implode(', ', $update_fields);
+		$sql.=" " . implode(', ', $updateFields);
 		if($where!='') {
 			$sql.=" WHERE " . $where;
 		}

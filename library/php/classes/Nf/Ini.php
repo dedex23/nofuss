@@ -69,7 +69,7 @@ class Ini
 				if (isset(self::$_result[$section_name])) {
 					return self::bindArrayToObject(self::$_result[$section_name]);
 				} else {
-					trigger_error('Section ' . $section_name . ' not found in the ini file');
+					throw new \Exception('Section ' . $section_name . ' not found in the ini file');
 				}
 			}
 		}

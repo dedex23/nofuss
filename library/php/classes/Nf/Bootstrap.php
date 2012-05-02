@@ -77,7 +77,7 @@ class Bootstrap {
 							// le préfixe détermine la version, le suffixe la locale
 							if(!empty($_SERVER['HTTP_HOST'])) {
 								$httpHost=strtolower($_SERVER['HTTP_HOST']);
-								list($localeFromUrl, $versionFromUrl)=$this->getLocaleAndVersionFromUrl($httpHost, $urlIni);
+								list($localeFromUrl, $versionFromUrl, $redirectToHost)=$this->getLocaleAndVersionFromUrl($httpHost, $urlIni);
 								if(!empty($localeFromUrl)) {
 									$locale=$localeFromUrl;
 								}
@@ -105,7 +105,7 @@ class Bootstrap {
 				$locale=$urlIni->i18n->defaultLocale;
 			}
 			else {
-				trigger_error('You have to set a default locale in url.ini');
+				throw new \Exception('You have to set a default locale in url.ini');
 			}
 		}
 		// we match the locale with the defined locale
@@ -124,7 +124,7 @@ class Bootstrap {
 				$locale=$urlIni->i18n->defaultLocale;
 			}
 			else {
-				trigger_error('You have to set a default locale in url.ini');
+				throw new \Exception('You have to set a default locale in url.ini');
 			}
 		}
 
@@ -137,7 +137,7 @@ class Bootstrap {
 				if(in_array('url', $localeSelectionOrderArray)) {
 					if(!empty($_SERVER['HTTP_HOST'])) {
 						$httpHost=strtolower($_SERVER['HTTP_HOST']);
-						list($localeFromUrl, $versionFromUrl)=$this->getLocaleAndVersionFromUrl($httpHost, $urlIni);
+						list($localeFromUrl, $versionFromUrl, $redirectToHost)=$this->getLocaleAndVersionFromUrl($httpHost, $urlIni);
 					}
 				}
 				if(!empty($versionFromUrl)) {
@@ -163,6 +163,17 @@ class Bootstrap {
 		Registry::set('locale', $locale);
 		Registry::set('version', $version);
 
+		// on lit le config.ini à la section concernée par notre environnement
+		$config = Ini::parse(Registry::get('applicationPath') . '/configs/config.ini', true, $locale . '_' . $environment . '_' . $version);
+		Registry::set('config', $config);
+
+
+		if(!empty($redirectToHost)) {
+			header("HTTP/1.1 301 Moved Permanently");
+			header("Location: http://" . $redirectToHost . $_SERVER['REQUEST_URI']);
+			return false;
+		}
+
 		// prevention contre l'utilisation de index.php
 		if(isset($_SERVER['REQUEST_URI']) && in_array($_SERVER['REQUEST_URI'], array('index.php','/index.php'))) {
 			header("HTTP/1.1 301 Moved Permanently");
@@ -170,14 +181,12 @@ class Bootstrap {
 			return false;
 		}
 
-		// on lit le config.ini à la section concernée par notre environnement
-		$config = Ini::parse(Registry::get('applicationPath') . '/configs/config.ini', true, $locale . '_' . $environment . '_' . $version);
-		Registry::set('config', $config);
-
 		return true;
 	}
 
 	private function getLocaleAndVersionFromUrl($httpHost, $urlIni) {
+
+		$redirectToHost=null;
 
 		if(!empty($this->_localeAndVersionFromUrlCache)) {
 			return $this->_localeAndVersionFromUrlCache;
@@ -189,22 +198,44 @@ class Bootstrap {
 			$found=false;
 			foreach($urlIni->versions as $version_name=>$prefix) {
 				if(!$found) {
+					$redirectToHost=null;
 					foreach($urlIni->suffixes as $locale=>$suffix) {
 						if($prefix=='') {
-							$httpHostToTest=str_replace('[version]', $prefix, $suffix);
+							$httpHostsToTest=array(str_replace('[version]', '', $suffix));
 						}
 						else {
-							$httpHostToTest=str_replace('[version]', $prefix, $suffix);
+							if(strpos($prefix, '|')!==false) {
+								$prefixes=array_values(explode('|', $prefix));
+								$redirectToHost=str_replace('..', '.', ($prefixes[0]=='<>'?str_replace('[version]', '', $suffix):str_replace('[version]', $prefixes[0] . '.', $suffix)));
+								foreach($prefixes as $thePrefix) {
+									// default empty prefix
+									if($thePrefix=='<>') {
+										$httpHostsToTest[]=str_replace('..', '.', str_replace('[version]', '', $suffix));
+									}
+									else {
+										$httpHostsToTest[]=str_replace('..', '.', str_replace('[version]', $thePrefix . '.', $suffix));
+									}
+								}
+							}
+							else {
+								$redirectToHost=null;
+								$httpHostsToTest=array(str_replace('..', '.', str_replace('[version]', $prefix, $suffix)));
+							}
 						}
 						// le test sur la chaîne reconstruite
-						if($httpHost==$httpHostToTest) {
-							$localeFromUrl=$locale;
-							$versionFromUrl=$version_name;
-							if($locale=='_default') {
-								$localeFromUrl=$urlIni->i18n->$version_name->defaultLocale;
+						foreach($httpHostsToTest as $httpHostToTest) {
+							if($httpHost==$httpHostToTest) {
+								$localeFromUrl=$locale;
+								$versionFromUrl=$version_name;
+								if($locale=='_default') {
+									$localeFromUrl=$urlIni->i18n->defaultLocale;
+								}
+								if($httpHostToTest==$redirectToHost) {
+									$redirectToHost=null;
+								}
+								$found=true;
+								break;
 							}
-							$found=true;
-							break;
 						}
 					}
 				 }
@@ -214,10 +245,10 @@ class Bootstrap {
 				unset($suffix);
 			}
 			unset($prefix);
-			$this->_localeAndVersionFromUrlCache=array($localeFromUrl, $versionFromUrl);
+			$this->_localeAndVersionFromUrlCache=array($localeFromUrl, $versionFromUrl, $redirectToHost);
 		}
 
-		return array($localeFromUrl, $versionFromUrl);
+		return array($localeFromUrl, $versionFromUrl, $redirectToHost);
 
 	}
 
@@ -429,10 +460,10 @@ class Bootstrap {
 				$front->setResponse($response);
 				$front->setApplicationNamespace($this->_applicationNamespace);
 
-				// routing (specify them in the order that you want them to be analyzed)
-				$front->setRoutesDirectory(Registry::get('applicationPath') . '/routes/' . Registry::get('version') . '/' . Registry::get('locale') . '/');
+				// routing
+				$front->setRoutesDirectory(Registry::get('applicationPath') . '/routes/' . Registry::get('version') . '/',  Registry::get('locale'));
+				$front->setRootRoutes(Registry::get('applicationPath') . '/routes/' . Registry::get('version') . '/', Registry::get('locale'));
 				$front->setStructuredRoutes();
-				$front->setRootRoutes(Registry::get('applicationPath') . '/routes/' . Registry::get('version') . '/' . Registry::get('locale') . '/');
 
 				$front->addModuleDirectory($this->_applicationNamespace, Registry::get('applicationPath') . '/application/' . Registry::get('version') . '/');
 				$front->addModuleDirectory('library', Registry::get('libraryPath') . '/php/application/' . Registry::get('version') . '/');

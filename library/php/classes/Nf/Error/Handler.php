@@ -80,11 +80,11 @@ class Handler extends \Exception
 		}
 	}
 
-	public static function handleForbidden($httpCode, $friendlyMessage='') {
+	public static function handleForbidden($httpCode=403, $friendlyMessage='') {
 		return self::handleHttpError('forbidden', $httpCode, $friendlyMessage);
 	}
 
-	public static function handleNotFound($httpCode, $friendlyMessage='') {
+	public static function handleNotFound($httpCode=404, $friendlyMessage='') {
 		return self::handleHttpError('notFound', $httpCode, $friendlyMessage);
 	}
 

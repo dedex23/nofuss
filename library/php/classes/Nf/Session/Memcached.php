@@ -17,7 +17,7 @@ class Memcached extends Session
         $this->_memcache = new \Memcache;
         $this->_lifeTime = $lifetime;
         if(strpos($params->hosts, ',')>0) {
-        	$hosts=split(',', $params->hosts);
+        	$hosts=explode(',', $params->hosts);
         	foreach($hosts as $host) {
 				$this->_memcache->addServer($host, $params->port);
 			}

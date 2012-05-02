@@ -11,8 +11,8 @@ class Front extends Singleton {
 
 	// pour le routeur
 	private $_routingPreference=array();
-	private $_routesDirectory;
-	private $_rootRoutesDirectory;
+	private $_routesDirectories=array();
+	private $_rootRoutesDirectories=array();
 	const rootRouteFilename = '_root.php';
 	const controllersDirectory = 'controllers';
 
@@ -119,18 +119,20 @@ class Front extends Singleton {
 
 // routes
 
-	public function setRoutesDirectory($path) {
+	public function setRoutesDirectory($path, $locale=null) {
 		$this->_routingPreference[]='directory';
-        $this->_routesDirectory = $path;
+		$this->_routesDirectories[] = $path . $locale . '/';
+		$this->_routesDirectories[] = $path;
     }
 
 	public function setStructuredRoutes() {
 		$this->_routingPreference[]='structured';
 	}
 
-	public function setRootRoutes($path) {
-		$this->_rootRoutesDirectory = $path;
+	public function setRootRoutes($path, $locale=null) {
 		$this->_routingPreference[]='root';
+		$this->_rootRoutesDirectories[] = $path . $locale . '/';
+		$this->_rootRoutesDirectories[] = $path;
 	}
 
 	public function findRoute() {
@@ -149,42 +151,51 @@ class Front extends Singleton {
 			unset($_routes);
 
 			if($routingPref=='directory') {
-				$subPath = ltrim((string) $uri, '/');
 
+				$subPath = ltrim((string) $uri, '/');
 				if (strpos($subPath, '/')) {
 		            $subPath = substr($subPath, 0, strpos($subPath, '/'));
 		        }
-
 				// on cherche le fichier subPath.php dans le répertoire de routes
 				if($subPath!='') {
-					$filename=$this->_routesDirectory . $subPath . '.php';
+					foreach($this->_routesDirectories as $routeDirectory) {
 
-					if(file_exists($filename)) {
-						require_once($filename);
-						for($i=count($_routes)-1; $i>=0; $i--){
-							$route=$_routes[$i];
+						if(!$foundController) {
+							$filename=$routeDirectory . $subPath . '.php';
 
-							// tester si match, sinon on continue jusqu'à ce qu'on trouve
-							if(preg_match('#' . $route[0] . '#', $uri, $result)) {
-								// on teste la présence du module controller action indiqué dans la route
-								if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
-									if(isset($route[2]) && isset($result[1])) {
-										$this->associateParams($route[2], $result[1]);
+							if(file_exists($filename)) {
+								require_once($filename);
+								for($i=count($_routes)-1; $i>=0; $i--){
+									$route=$_routes[$i];
+
+									// tester si match, sinon on continue jusqu'à ce qu'on trouve
+									if(preg_match('#' . $route[0] . '#', $uri, $result)) {
+										// on teste la présence du module controller action indiqué dans la route
+										if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
+											if(isset($route[2]) && isset($result[1])) {
+												$this->associateParams($route[2], $result[1]);
+											}
+											break;
+										}
 									}
-									break;
 								}
+								unset($route);
 							}
+							unset($_routes);
 						}
-						unset($route);
 					}
+					unset($routeDirectory);
 				}
 			}
 
 			if(!$foundController && $routingPref=='structured') {
+
 				// l'url doit être de la forme /m/c/a/...
 				if(preg_match('#^(\w+)/(\w+)/(\w+)#', $uri, $result)) {
+
 					// on regarde si on a un fichier et une action pour le même chemin dans les répertoires des modules
 					if($foundController=$this->checkModuleControllerAction($result[1], $result[2], $result[3])) {
+
 						// les éventuels paramètres sont en /variable/value
 						$paramsFromUri=ltrim(preg_replace('#^(\w+)/(\w+)/(\w+)#', '', $originalUri), '/');
 
@@ -211,24 +222,32 @@ class Front extends Singleton {
 
 			if(!$foundController && $routingPref=='root') {
 				// on va lire le fichier root
-				$filename=$this->_routesDirectory . self::rootRouteFilename;
 
-				if(file_exists($filename)) {
-					require_once($filename);
-					foreach($_routes as $route) {
-						// tester si match, sinon on continue jusqu'à ce qu'on trouve
-						if(preg_match('#' . $route[0] . '#', $uri, $result)) {
-							// on teste la présence du module controller action indiqué dans la route
-							if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
-								if(isset($route[2]) && isset($result[1])) {
-									$this->associateParams($route[2], $result[1]);
+				foreach($this->_rootRoutesDirectories as $routeDirectory) {
+					if(!$foundController) {
+
+						$filename=$routeDirectory . self::rootRouteFilename;
+
+						if(file_exists($filename)) {
+							require_once($filename);
+							foreach($_routes as $route) {
+								// tester si match, sinon on continue jusqu'à ce qu'on trouve
+								if(preg_match('#' . $route[0] . '#', $uri, $result)) {
+									// on teste la présence du module controller action indiqué dans la route
+									if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
+										if(isset($route[2]) && isset($result[1])) {
+											$this->associateParams($route[2], $result[1]);
+										}
+										break;
+									}
 								}
-								break;
 							}
+							unset($route);
 						}
+						unset($routes);
 					}
-					unset($route);
 				}
+				unset($routeDirectory);
 			}
 		}
 
@@ -257,6 +276,7 @@ class Front extends Singleton {
 
 		foreach($this->_moduleDirectories as $moduleDirectory=>$moduleDirectoryInfos) {
 			$controllerFilename=$this->getControllerFilename($moduleDirectoryInfos['namespace'], $moduleDirectoryInfos['directory'], $inModule, $inController);
+
 			if(file_exists($controllerFilename)) {
 				$this->_moduleNamespace = $moduleDirectoryInfos['namespace'];
 				$this->_moduleName = $inModule;

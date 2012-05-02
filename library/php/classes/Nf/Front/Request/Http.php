@@ -104,7 +104,6 @@ class Http extends AbstractRequest
 			else {
 				if(mb_substr($requestPage, -1, 1)=='/') {
 					$redirectionUrl='http://' . $_SERVER['HTTP_HOST'] . rtrim($requestPage, '/') . $requestParams;
-					die($redirectionUrl);
 				}
 			}
 

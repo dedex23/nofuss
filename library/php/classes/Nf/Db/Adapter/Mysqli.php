@@ -80,7 +80,10 @@ class Mysqli extends AbstractAdapter
     }
 
     protected function _quote($value) {
-        if (is_int($value) || is_float($value)) {
+        if(null===$value) {
+			return 'NULL';
+        }
+		elseif(is_int($value) || is_float($value) || $value instanceof \Nf\Db\Expression) {
             return $value;
         }
         $this->_connect();
@@ -102,7 +105,7 @@ class Mysqli extends AbstractAdapter
 			$insertFields[]=$this->quoteIdentifier($key) . "=" . $this->quote($value);
 		}
 		$sql.=" " . implode(', ', $insertFields);
-
+echo $sql;
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
     }

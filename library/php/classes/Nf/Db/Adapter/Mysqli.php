@@ -105,7 +105,7 @@ class Mysqli extends AbstractAdapter
 			$insertFields[]=$this->quoteIdentifier($key) . "=" . $this->quote($value);
 		}
 		$sql.=" " . implode(', ', $insertFields);
-echo $sql;
+
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
     }

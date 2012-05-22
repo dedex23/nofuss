@@ -179,4 +179,47 @@ class Http extends AbstractResponse
 		$this->setHeader('Pragma', 'public', true);
 	}
 
+	public function setContentType($type='html') {
+		switch($type) {
+			case 'atom':
+				$this->setHeader('content-type', 'application/atom+xml');
+				break;
+			case 'css':
+				$this->setHeader('content-type', 'text/css');
+				break;
+			case 'gif':
+				$this->setHeader('content-type', 'image/gif');
+				break;
+			case 'jpeg':
+			case 'jpg':
+				$this->setHeader('content-type', 'image/jpeg');
+				break;
+			case 'js':
+			case 'javascript':
+				$this->setHeader('content-type', 'text/javascript');
+				break;
+			case 'json':
+				$this->setHeader('content-type', 'application/json');
+				break;
+			case 'pdf':
+				$this->setHeader('content-type', 'application/pdf');
+				break;
+			case 'png':
+				$this->setHeader('content-type', 'image/png');
+			case 'rss':
+				$this->setHeader('content-type', 'application/rss+xml');
+				break;
+			case 'text':
+				$this->setHeader('content-type', 'text/plain');
+				break;
+			case 'xml':
+				$this->setHeader('content-type', 'text/xml');
+				break;
+			case 'html':
+			default:
+				$this->setHeader('content-type', 'text/html');
+				break;
+		}
+	}
+
 }

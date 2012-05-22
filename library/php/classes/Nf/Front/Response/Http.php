@@ -42,14 +42,21 @@ class Http extends AbstractResponse
         return $this;
     }
 
-    public function redirect($url, $code = 302) {
+    public function redirect($url, $code = 302, $exit=true) {
         $this->canSendHeaders();
         $this->setHeader('Location', $url, true)
              ->setHttpResponseCode($code);
-		
+    	if($exit) {
+    		$front=\Nf\Front::getInstance();
+    		$front->postAction();
+    		$this->clearBuffer();
+    		$this->clearBody();
+    		$this->sendHeaders();
+    		exit;
+    	}
 		return $this;
     }
-	
+
     public function isRedirect() {
         return $this->_isRedirect;
     }
@@ -158,7 +165,7 @@ class Http extends AbstractResponse
             header('HTTP/1.1 ' . $this->_httpResponseCode);
             $httpCodeSent = true;
         }
-		
+
 		return $this;
     }
 

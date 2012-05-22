@@ -390,7 +390,10 @@ class Front extends Singleton {
 
 	// called after action
 	public function postAction() {
-
+		$reflected = new \ReflectionClass($this->_controllerInstance);
+		if($reflected->hasMethod($this->_actionName . 'Action')) {
+			call_user_func(array($this->_controllerInstance, 'postAction'), null);
+		}
 	}
 
 }

@@ -2,12 +2,12 @@
 
 namespace Nf;
 
-abstract class File 
-{	
+abstract class File
+{
 	public static function mkdir($pathname, $mode=0775, $recursive=false){
 		if(!is_dir($pathname)) {
 			$oldumask = umask(0);
-			$ret = mkdir($pathname, $mode, $recursive);
+			$ret = @mkdir($pathname, $mode, $recursive);
 			umask($oldumask);
 			return $ret;
 		}
@@ -23,27 +23,27 @@ abstract class File
         }
         return false;
     }
-	
+
 	public static function uncompress($src, $dest, $unlink_src=false){
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 		$mimeType = finfo_file($finfo, $src);
 		finfo_close($finfo);
-		
+
 		$ret = false;
 		switch($mimeType) {
 			case 'application/x-gzip':
 				exec('gzip -dcf ' . $src . ($dest!==null ? ' > '.$dest : ''), $out, $ret);
-				break;	
+				break;
 		}
-		
+
 		if(isset($ret) && $ret===0) {
 			$ret = true;
-			if($unlink_src) 
+			if($unlink_src)
 				@unlink($src);
 		}
 		return $ret;
 	}
-	
+
 	public static function generatePath($input){
 		$input=''.$input;
 		// 15567 	=> /7/15/56/7/@/

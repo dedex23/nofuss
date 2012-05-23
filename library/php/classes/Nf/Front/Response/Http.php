@@ -42,14 +42,21 @@ class Http extends AbstractResponse
         return $this;
     }
 
-    public function redirect($url, $code = 302) {
+    public function redirect($url, $code = 302, $exit=true) {
         $this->canSendHeaders();
         $this->setHeader('Location', $url, true)
              ->setHttpResponseCode($code);
-		
+    	if($exit) {
+    		$front=\Nf\Front::getInstance();
+    		$front->postAction();
+    		$this->clearBuffer();
+    		$this->clearBody();
+    		$this->sendHeaders();
+    		exit;
+    	}
 		return $this;
     }
-	
+
     public function isRedirect() {
         return $this->_isRedirect;
     }
@@ -158,7 +165,7 @@ class Http extends AbstractResponse
             header('HTTP/1.1 ' . $this->_httpResponseCode);
             $httpCodeSent = true;
         }
-		
+
 		return $this;
     }
 
@@ -170,6 +177,49 @@ class Http extends AbstractResponse
 		$this->setHeader('Expires', gmdate('D, d M Y H:i:s', time() + $minutes * 60) . ' GMT', true);
 		$this->setHeader('Cache-Control', 'max-age=' . $minutes * 60, true);
 		$this->setHeader('Pragma', 'public', true);
+	}
+
+	public function setContentType($type='html') {
+		switch($type) {
+			case 'atom':
+				$this->setHeader('content-type', 'application/atom+xml');
+				break;
+			case 'css':
+				$this->setHeader('content-type', 'text/css');
+				break;
+			case 'gif':
+				$this->setHeader('content-type', 'image/gif');
+				break;
+			case 'jpeg':
+			case 'jpg':
+				$this->setHeader('content-type', 'image/jpeg');
+				break;
+			case 'js':
+			case 'javascript':
+				$this->setHeader('content-type', 'text/javascript');
+				break;
+			case 'json':
+				$this->setHeader('content-type', 'application/json');
+				break;
+			case 'pdf':
+				$this->setHeader('content-type', 'application/pdf');
+				break;
+			case 'png':
+				$this->setHeader('content-type', 'image/png');
+			case 'rss':
+				$this->setHeader('content-type', 'application/rss+xml');
+				break;
+			case 'text':
+				$this->setHeader('content-type', 'text/plain');
+				break;
+			case 'xml':
+				$this->setHeader('content-type', 'text/xml');
+				break;
+			case 'html':
+			default:
+				$this->setHeader('content-type', 'text/html');
+				break;
+		}
 	}
 
 }

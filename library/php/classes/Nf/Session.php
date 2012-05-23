@@ -21,7 +21,7 @@ abstract class Session extends Singleton
 		}
 		$sessionHandler=self::factory($sessionHandlerName, $sessionParams, $config->session->lifetime);
 		session_name($config->session->cookie->name);
-		session_set_cookie_params(0, $config->session->cookie->path, $config->session->cookie->domain, false, true);	    
+		session_set_cookie_params(0, $config->session->cookie->path, $config->session->cookie->domain, false, true);
 	    session_set_save_handler(
 			array(&$sessionHandler, 'open'),
 			array(&$sessionHandler, 'close'),
@@ -39,6 +39,14 @@ abstract class Session extends Singleton
 
 	public static function getData() {
 		return self::$_data;
+	}
+
+	public function __get($key) {
+		return self::get($key);
+	}
+
+	public function __set($key, $value) {
+		return self::set($key, $value);
 	}
 
 	public static function get($key) {

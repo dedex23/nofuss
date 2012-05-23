@@ -169,7 +169,7 @@ class Front extends Singleton {
 									for($i=count($_routes)-1; $i>=0; $i--){
 										$route=$_routes[$i];
 										// tester si match, sinon on continue jusqu'à ce qu'on trouve
-										if(preg_match('#' . $route[0] . '#', $uri, $result)) {
+										if(preg_match('#^' . $route[0] . '#', $uri, $result)) {
 											// on teste la présence du module controller action indiqué dans la route
 											if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
 												if(isset($route[2])) {

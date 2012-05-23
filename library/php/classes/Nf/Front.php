@@ -138,7 +138,8 @@ class Front extends Singleton {
 	public function findRoute() {
 
 		$foundController=null;
-		$originalUri=$this->_request->getUri();
+		$config=Registry::get('config');
+		$originalUri=$this->_request->getUri();		
 
 		// remove everything after a '?' which is not used in the routing system
 		$uri = preg_replace('/\?.*$/', '', $originalUri);
@@ -190,8 +191,11 @@ class Front extends Singleton {
 
 			if(!$foundController && $routingPref=='structured') {
 
-				// l'url doit être de la forme /m/c/a/...
-				if(preg_match('#^(\w+)/(\w+)/(\w+)#', $uri, $result)) {
+				// l'url doit être de la forme /m/c/a/, ou /m/c/ ou /m/
+				if(preg_match('#^(\w+)/?(\w*)/?(\w*)#', $uri, $result)) {
+					
+					$result[2] = !empty($result[2]) ? $result[2] : $config->front->default->controller;
+					$result[3] = !empty($result[3]) ? $result[3] : $config->front->default->action;
 
 					// on regarde si on a un fichier et une action pour le même chemin dans les répertoires des modules
 					if($foundController=$this->checkModuleControllerAction($result[1], $result[2], $result[3])) {
@@ -234,7 +238,7 @@ class Front extends Singleton {
 								for($i=count($_routes)-1; $i>=0; $i--){
 									$route=$_routes[$i];
 									// tester si match, sinon on continue jusqu'à ce qu'on trouve
-									if(preg_match('#' . $route[0] . '#', $uri, $result)) {
+									if(preg_match('#^' . $route[0] . '#', $uri, $result)) {
 										// on teste la présence du module controller action indiqué dans la route
 										if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
 											if(isset($route[2])) {
@@ -256,7 +260,6 @@ class Front extends Singleton {
 		// si c'est la route par défaut
 		if(!$foundController) {
 			if(empty($uri)) {
-				$config=Registry::get('config');
 				if($foundController=$this->checkModuleControllerAction($config->front->default->module, $config->front->default->controller, $config->front->default->action)) {
 					if(isset($route[2]) && isset($result[1])) {
 						$this->associateParams($route[2], $result[1]);

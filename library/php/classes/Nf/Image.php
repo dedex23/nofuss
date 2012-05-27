@@ -6,14 +6,7 @@ abstract class Image
 {
 	// intégrer ce code : https://gist.github.com/1364489
 
-	public static function generateThumbnail($sourceFile, $destFile, $width=100, $height=100) {
-
-		// the location of your image
-		$imagePath = $sourceFile;
-
-		// these are treated as maximums and aspect ratio is maintained
-		$thumbnailWidth = $width;
-		$thumbnailHeight = $height;
+	public static function generateThumbnail($imagePath, $thumbnailPath, $thumbnailWidth=100, $thumbnailHeight=100) {
 
 		// path to the sRGB ICC profile
 		// $srgbPath = realpath(__DIR__ . '/Image/sRGB_v4_ICC_preference.icc');
@@ -36,24 +29,36 @@ abstract class Image
 		// set colorspace
 		// $image->setImageColorspace(\Imagick::COLORSPACE_SRGB);
 
-		// determine which dimension to fit to
-		$fitWidth = ($thumbnailWidth / $width) < ($thumbnailHeight / $height);
+		// width & height : maximums and aspect ratio is maintained
+		if($thumbnailHeight==0) {
+			$r=$width/$height;
+			$thumbnailHeight=ceil($thumbnailWidth/$r);
+			// create thumbnail
+			$image->thumbnailImage($thumbnailWidth, $thumbnailHeight);
+		}
+		elseif($thumbnailWidth==0) {
+			$r=$width/$height;
+			$thumbnailWidth=ceil($thumbnailHeight/$r);
+			// create thumbnail
+			$image->thumbnailImage($thumbnailWidth, $thumbnailHeight);
+		}
+		else {
+			// determine which dimension to fit to
+			$fitWidth = ($thumbnailWidth / $width) < ($thumbnailHeight / $height);
 
-		// create thumbnail
-		$image->thumbnailImage(
-		  $fitWidth ? $thumbnailWidth : 0,
-		  $fitWidth ? 0 : $thumbnailHeight
-		);
-
-		// generate a thumbnail filename
-		$thumbnailPath = $destFile;
+			// create thumbnail
+			$image->thumbnailImage(
+			  $fitWidth ? $thumbnailWidth : 0,
+			  $fitWidth ? 0 : $thumbnailHeight
+			);
+		}
 
 		// save thumbnail and free up memory
 		$image->writeImage($thumbnailPath);
 		$image->clear();
 		$image->destroy();
 
-		return $destFile;
+		return $thumbnailPath;
 	}
 
 

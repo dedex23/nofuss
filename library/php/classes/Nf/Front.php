@@ -202,7 +202,7 @@ class Front extends Singleton {
 					if($foundController=$this->checkModuleControllerAction($result[1], $result[2], $result[3])) {
 
 						// les éventuels paramètres sont en /variable/value
-						$paramsFromUri=ltrim(preg_replace('#^(\w+)/(\w+)/(\w+)$#', '', $originalUri), '/');
+						$paramsFromUri=ltrim(preg_replace('#^(\w+)/(\w+)/(\w+)#', '', $originalUri), '/');
 
 						// si on envoie des variables avec des /
 						if($paramsFromUri!='') {

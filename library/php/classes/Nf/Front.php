@@ -194,8 +194,8 @@ class Front extends Singleton {
 				// l'url doit être de la forme /m/c/a/, ou /m/c/ ou /m/
 				if(preg_match('#^(\w+)/?(\w*)/?(\w*)#', $uri, $result)) {
 					
-					$result[2] = !empty($result[2]) ? $result[2] : $config->front->default->controller;
-					$result[3] = !empty($result[3]) ? $result[3] : $config->front->default->action;
+					$result[2] = !empty($result[2]) ? $result[2] : 'index';
+					$result[3] = !empty($result[3]) ? $result[3] : 'index';
 
 					// on regarde si on a un fichier et une action pour le même chemin dans les répertoires des modules
 					if($foundController=$this->checkModuleControllerAction($result[1], $result[2], $result[3])) {
@@ -206,7 +206,7 @@ class Front extends Singleton {
 						// si on envoie des variables avec des /
 						if($paramsFromUri!='') {
 							if(substr_count($paramsFromUri, '/')%2==1) {
-								preg_match_all('/([a-z0-9_]+)\/([a-z0-9_]*)/i', $paramsFromUri, $arrParams, PREG_SET_ORDER);
+								preg_match_all('/(\w+)\/([^\/]*)/', $paramsFromUri, $arrParams, PREG_SET_ORDER);
 								for ($matchi = 0; $matchi < count($arrParams); $matchi++) {
 									$this->_request->setParam($arrParams[$matchi][1], $arrParams[$matchi][2]);
 								}
@@ -214,7 +214,7 @@ class Front extends Singleton {
 
 							// si on envoie des variables avec des var1=val1
 							if(substr_count($paramsFromUri, '=')>=1) {
-								preg_match_all('/([a-z0-9_]+)=([^\/&]*)/i', $paramsFromUri, $arrParams, PREG_SET_ORDER);
+								preg_match_all('/(\w+)=([^\/&]*)/', $paramsFromUri, $arrParams, PREG_SET_ORDER);
 								for ($matchi = 0; $matchi < count($arrParams); $matchi++) {
 									$this->_request->setParam($arrParams[$matchi][1], $arrParams[$matchi][2]);
 								}

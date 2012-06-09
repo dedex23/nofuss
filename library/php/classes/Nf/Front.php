@@ -171,7 +171,7 @@ class Front extends Singleton {
 									for($i=count($_routes)-1; $i>=0; $i--){
 										$route=$_routes[$i];
 										// tester si match, sinon on continue jusqu'à ce qu'on trouve
-										if(preg_match('#^' . $route[0] . '$#', $uri, $result)) {
+										if(preg_match('#^' . $route[0] . '#', $uri, $result)) {
 											// on teste la présence du module controller action indiqué dans la route
 											if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
 												if(isset($route[2])) {
@@ -193,8 +193,8 @@ class Front extends Singleton {
 			if(!$foundController && $routingPref=='structured') {
 
 				// l'url doit être de la forme /m/c/a/, ou /m/c/ ou /m/
-				if(preg_match('#^(\w+)/?(\w*)/?(\w*)$#', $uri, $result)) {
-
+				if(preg_match('#^(\w+)/?(\w*)/?(\w*)#', $uri, $result)) {
+					
 					$result[2] = !empty($result[2]) ? $result[2] : 'index';
 					$result[3] = !empty($result[3]) ? $result[3] : 'index';
 
@@ -202,12 +202,12 @@ class Front extends Singleton {
 					if($foundController=$this->checkModuleControllerAction($result[1], $result[2], $result[3])) {
 
 						// les éventuels paramètres sont en /variable/value
-						$paramsFromUri=ltrim(preg_replace('#^(\w+)/(\w+)/(\w+)$#', '', $originalUri), '/');
+						$paramsFromUri=ltrim(preg_replace('#^(\w+)/(\w+)/(\w+)#', '', $originalUri), '/');
 
 						// si on envoie des variables avec des /
 						if($paramsFromUri!='') {
 							if(substr_count($paramsFromUri, '/')%2==1) {
-								preg_match_all('/([a-z0-9_]+)\/([a-z0-9_]*)/i', $paramsFromUri, $arrParams, PREG_SET_ORDER);
+								preg_match_all('/(\w+)\/([^\/]*)/', $paramsFromUri, $arrParams, PREG_SET_ORDER);
 								for ($matchi = 0; $matchi < count($arrParams); $matchi++) {
 									$this->_request->setParam($arrParams[$matchi][1], $arrParams[$matchi][2]);
 								}
@@ -215,7 +215,7 @@ class Front extends Singleton {
 
 							// si on envoie des variables avec des var1=val1
 							if(substr_count($paramsFromUri, '=')>=1) {
-								preg_match_all('/([a-z0-9_]+)=([^\/&]*)/i', $paramsFromUri, $arrParams, PREG_SET_ORDER);
+								preg_match_all('/(\w+)=([^\/&]*)/', $paramsFromUri, $arrParams, PREG_SET_ORDER);
 								for ($matchi = 0; $matchi < count($arrParams); $matchi++) {
 									$this->_request->setParam($arrParams[$matchi][1], $arrParams[$matchi][2]);
 								}
@@ -239,7 +239,7 @@ class Front extends Singleton {
 								for($i=count($_routes)-1; $i>=0; $i--){
 									$route=$_routes[$i];
 									// tester si match, sinon on continue jusqu'à ce qu'on trouve
-									if(preg_match('#^' . $route[0] . '$#', $uri, $result)) {
+									if(preg_match('#^' . $route[0] . '#', $uri, $result)) {
 										// on teste la présence du module controller action indiqué dans la route
 										if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
 											if(isset($route[2])) {

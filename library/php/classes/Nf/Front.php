@@ -332,9 +332,11 @@ class Front extends Singleton {
 		}
 		else {
 			$config=Registry::get('config');
-			if($config->labels->loadWith=='view') {
-				$labelManager=LabelManager::getInstance();
-				$labelManager->loadLabels(Registry::get('locale'));
+			if(isset($config->labels)) {
+				if($config->labels->loadWith=='view') {
+					$labelManager=LabelManager::getInstance();
+					$labelManager->loadLabels(Registry::get('locale'));
+				}
 			}
 			$view=View::factory($config->view->engine);
 			$view->setResponse($this->_response);

@@ -35,6 +35,7 @@ class Input
 	const V_EMAIL='email';
 	const V_MATCHES='matches';
 	const V_URL='url';
+	const V_DEFAULT='default';
 
 	private $_params=array();
 	private $_filters=array();
@@ -100,6 +101,7 @@ class Input
 		}
 		elseif($metaAction=='validate') {
 			$metaSource=$this->_validators;
+			$isValid=true;
 		}
 
 		foreach($metaSource as $paramName=>$options) {
@@ -108,12 +110,13 @@ class Input
 				$this->setField($paramName, (isset($this->_params[$paramName]) ? $this->_params[$paramName] : null));
 			}
 			if($metaAction=='validate') {
+
 				if(!isset($this->_fields[$paramName])) {
 					$this->setField($paramName, (isset($this->_params[$paramName]) ? $this->_params[$paramName] : null));
 				}
+
 				$validatorIndex=0;
 				$validators=array();
-				$isValid=true;
 			}
 
 			$options=(array)$options;

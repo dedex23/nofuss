@@ -8,18 +8,24 @@ abstract class Session extends Singleton
 
 	protected static $_data=false;
 
-	public static function factory($type, $params, $lifetime) {
-		$className=get_class() . '\\' . ucfirst($type);
+	public static function factory($namespace, $class, $params, $lifetime) {
+		$className='\\' . $namespace . '\\' . ucfirst($class);
 		return new $className($params, $lifetime);
 	}
 
 	public static function start() {
 		$config=Registry::get('config');
-		$sessionHandlerName=$config->session->handler;
+		// optional parameters sent to the constructor
 		if(isset($config->session->params)) {
 			$sessionParams=$config->session->params;
 		}
-		$sessionHandler=self::factory($sessionHandlerName, $sessionParams, $config->session->lifetime);
+		if(is_object($config->session->handler)) {
+			$sessionHandler=self::factory($config->session->handler->namespace, $config->session->handler->class, $sessionParams, $config->session->lifetime);
+		}
+		else {
+			$sessionHandler=self::factory('Nf\Session', $config->session->handler, $sessionParams, $config->session->lifetime);
+		}
+
 		session_name($config->session->cookie->name);
 		session_set_cookie_params(0, $config->session->cookie->path, $config->session->cookie->domain, false, true);
 	    session_set_save_handler(

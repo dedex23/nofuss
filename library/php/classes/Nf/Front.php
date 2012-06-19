@@ -194,7 +194,7 @@ class Front extends Singleton {
 
 				// l'url doit être de la forme /m/c/a/, ou /m/c/ ou /m/
 				if(preg_match('#^(\w+)/?(\w*)/?(\w*)#', $uri, $result)) {
-					
+
 					$result[2] = !empty($result[2]) ? $result[2] : 'index';
 					$result[3] = !empty($result[3]) ? $result[3] : 'index';
 
@@ -332,6 +332,12 @@ class Front extends Singleton {
 		}
 		else {
 			$config=Registry::get('config');
+			if(isset($config->labels)) {
+				if($config->labels->loadWith=='view') {
+					$labelManager=LabelManager::getInstance();
+					$labelManager->loadLabels(Registry::get('locale'));
+				}
+			}
 			$view=View::factory($config->view->engine);
 			$view->setResponse($this->_response);
 			return $view;

@@ -38,6 +38,35 @@ abstract class Date
 			throw new \Exception('Erreur date_from_mysql : date non reconnue ' . $date_origine);
 		}
 	}
+	
+	public static function dateRange($first, $last, $step = '+1 day') { 
+
+	    $dates = array();
+	    $current = strtotime($first);
+	    $last = strtotime($last);
+	    
+	    switch ($step){
+	    	case '+1 day':
+	    		$format = 'Y-m-d';
+	    		break;
+    		case '+1 month':
+    			$format = 'Y-m-01';
+    			break;    		
+    		case '+1 year':
+    			$format = 'Y-01-01';
+    			break;	
+	    	default:
+	    		$format = 'Y-m-d';
+	    }
+	
+	    while( $current <= $last ) { 
+	
+	        $dates[] = date($format, $current);
+	        $current = strtotime($step, $current);
+	    }
+	
+	    return $dates;
+	}
 
 	public static function dateToMysql($date_origine, $return_time=false) {
 

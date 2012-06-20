@@ -24,6 +24,7 @@ class Input
 	const V_ALPHANUM='alphaNum';
 	const V_NUMERIC='numeric';
 	const V_BASE64='base64';
+	const V_EQUALS='equals';
 	const V_REGEXP='regexp';
 	const V_REQUIRED='required';
 	const V_NOTEMPTY='notEmpty';
@@ -93,6 +94,13 @@ class Input
 		return $this->_fields;
 	}
 
+	public function getFilteredFields() {
+		$filteredFields=array();
+		foreach($this->_fields as $fieldName=>$data) {
+			$filteredFields[$fieldName]=$data['value'];
+		}
+		return $filteredFields;
+	}
 
 	private function metaFilterAndValidate($metaAction) {
 
@@ -336,6 +344,10 @@ class Input
 
 	public static function validateNumeric($value) {
 		return ($this->filterNumeric($value)==$value);
+	}
+
+	public static function validateEquals($value, $check) {
+		return (bool)($value==$check);
 	}
 
 	public static function validateRegexp($value, $regexp) {

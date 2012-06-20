@@ -5,7 +5,7 @@ namespace App\Test;
 class IndexController extends \App\Controller {
 
 	function indexAction(){
-		echo 'index from cli';
+		echo 'Hello world from cli !' . PHP_EOL;
 	}
 
 }

@@ -25,7 +25,8 @@ class Php extends View
 		parent::__construct();
 		$front=Front::getInstance();
 		$this->setBasePath($front->getModuleName());
-		$this->setLocale(Registry::get('locale'));
+		// send the label Manager to the view
+		$this->_vars['labels'] = \Nf\LabelManager::getInstance();
 	}
 
     /**

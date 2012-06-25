@@ -15,7 +15,7 @@ class Input
 	const F_REGEXP='regexp';
 	const F_STRING='string';
 	const F_TRIM='trim';
-	const F_URK='url';
+	const F_URL='url';
 
 	const V_INTEGER='int';
 	const V_NATURAL='natural';

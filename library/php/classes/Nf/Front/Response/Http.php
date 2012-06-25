@@ -48,7 +48,7 @@ class Http extends AbstractResponse
              ->setHttpResponseCode($code);
     	if($exit) {
     		$front=\Nf\Front::getInstance();
-    		$front->postAction();
+    		$front->postLaunchAction();
     		$this->clearBuffer();
     		$this->clearBody();
     		$this->sendHeaders();

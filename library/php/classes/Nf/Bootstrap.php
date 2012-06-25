@@ -484,7 +484,7 @@ class Bootstrap {
 							if(!$front->response->isRedirect())
 								$front->launchAction();
 							if(!$front->response->isRedirect())
-								$front->postAction();
+								$front->postLaunchAction();
 							$response->sendResponse();
 						}
 					}

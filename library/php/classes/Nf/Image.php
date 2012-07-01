@@ -4,12 +4,14 @@ namespace Nf;
 
 abstract class Image
 {
-	// intégrer ce code : https://gist.github.com/1364489
 
 	public static function generateThumbnail($imagePath, $thumbnailPath, $thumbnailWidth=100, $thumbnailHeight=100, $cut=false) {
 
 		// load the original image
 		$image = new \Imagick($imagePath);
+
+		// undocumented method to limit imagick to one cpu thread
+		$image->setResourceLimit(6, 1);
 
 		// get the original dimensions
 		$width = $image->getImageWidth();
@@ -21,7 +23,7 @@ abstract class Image
 			if($thumbnailHeight==0) {
 				$r=$width/$height;
 				$thumbnailHeight=ceil($thumbnailWidth/$r);
-				// create thumbnail
+				// create the thumbnail
 				$image->thumbnailImage($thumbnailWidth, $thumbnailHeight);
 			}
 			elseif($thumbnailWidth==0) {
@@ -63,20 +65,12 @@ abstract class Image
 
 			$workingImage=$image->getImage();
 			$workingImage->contrastImage(50);
-			//$workingImage->setImageBias(25000);
+			$workingImage->setImageBias(10000);
 			$kernel = array( 0,-1,0,
 			                 -1,4,-1,
 			                 0,-1,0);
 
 			$workingImage->convolveImage($kernel);
-			//$workingImage->edgeImage(1);
-
-
-			//header('Content-type: image/jpg');
-//			echo $workingImage;
-//			die();
-
-
 
 			$x=0;
 			$y=0;
@@ -114,7 +108,6 @@ abstract class Image
 				}
 			}
 
-			// @image.crop(x, y, crop_width, crop_height)
 			$image->cropImage($thumbnailWidth, $thumbnailHeight, $x, $y);
 		}
 
@@ -138,7 +131,7 @@ abstract class Image
 			}
 			$hist[$theColor]+=$p->getColorCount();
 		}
-		// calculates the entropy from the histogram
+		// calculate the entropy from the histogram
 		// cf http://www.mathworks.com/help/toolbox/images/ref/entropy.html
 		$entropy=0;
 		foreach($hist as $c=>$v) {
@@ -147,16 +140,8 @@ abstract class Image
 		return $entropy;
 	}
 
-	// inspired from http://codebrawl.com/contests/content-aware-image-cropping-with-chunkypng
-	public static function contentAwareCrop($sourceFile, $destFile, $width=100, $height=100) {
-		// 1) $im->scaleImage(2000, 1500, true); // => 1600x1200
-		// 2) bestfit
-		//Imagick::resizeImage ( int $columns , int $rows , int $filter , float $blur [, bool $bestfit = false ] )
-	}
-
 	public static function identifyImage($sourceFile) {
 		return \Imagick::identifyImage($sourceFile);
 	}
-
 
 }

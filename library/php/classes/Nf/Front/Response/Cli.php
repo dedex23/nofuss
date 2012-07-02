@@ -30,8 +30,4 @@ class Cli extends AbstractResponse
         return false;
     }
 
-	public function cr() {
-		return PHP_EOL;
-	}
-
 }

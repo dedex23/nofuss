@@ -168,6 +168,13 @@ class Http extends AbstractResponse
 
 		return $this;
     }
+	
+	public function displayError($str) {
+		echo '<pre>';
+    	echo 'erreur !';
+		debug_print_backtrace();
+		echo '</pre>';
+	}
 
 	public function cr() {
 		return '<br>';

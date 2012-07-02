@@ -36,16 +36,11 @@ abstract class AbstractResponse
     }
 
     public function displayError($str) {
-    	// $this->sendHeaders();
-		echo '<pre>';
-    	echo 'erreur !';
-		debug_print_backtrace();
-		echo '</pre>';
-		// echo $str;
+    	debug_print_backtrace();
 	}
 
 	public function cr() {
-		return "\n";
+		return PHP_EOL;
 	}
 
 }

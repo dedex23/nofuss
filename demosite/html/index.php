@@ -1,7 +1,5 @@
 <?php
 
-$timeBegin=microtime(true);
-
 error_reporting(E_ALL);
 date_default_timezone_set('Europe/Paris');
 
@@ -35,6 +33,3 @@ $bootstrap=new \Nf\Bootstrap($libraryPath, $applicationPath);
 $bootstrap->setApplicationNamespace($applicationNamespace);
 
 $bootstrap->go();
-
-$timeEnd=microtime(true);
-echo '<hr />time = ' . ceil(1000*($timeEnd - $timeBegin));

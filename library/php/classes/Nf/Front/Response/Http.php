@@ -48,7 +48,7 @@ class Http extends AbstractResponse
              ->setHttpResponseCode($code);
     	if($exit) {
     		$front=\Nf\Front::getInstance();
-    		$front->postAction();
+    		$front->postLaunchAction();
     		$this->clearBuffer();
     		$this->clearBody();
     		$this->sendHeaders();
@@ -180,7 +180,8 @@ class Http extends AbstractResponse
 		return '<br>';
 	}
 
-	public function setCachable($minutes) {
+	// sends header to allow the browser to cache the response a given time
+	public function setCacheable($minutes) {
 		$this->setHeader('Expires', gmdate('D, d M Y H:i:s', time() + $minutes * 60) . ' GMT', true);
 		$this->setHeader('Cache-Control', 'max-age=' . $minutes * 60, true);
 		$this->setHeader('Pragma', 'public', true);

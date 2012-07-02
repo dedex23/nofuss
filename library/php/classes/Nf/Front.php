@@ -320,7 +320,7 @@ class Front extends Singleton {
 			$refs=array($refs);
 		}
 		for ($refi = 0; $refi < count($refs); $refi++) {
-			if(isset($routeParams[$refi])) {
+			if(isset($routeParams[$refi]) && isset($refs[$refi+1])) {
 				$this->_request->setParam($routeParams[$refi], $refs[$refi+1]);
 			}
 		}
@@ -332,12 +332,6 @@ class Front extends Singleton {
 		}
 		else {
 			$config=Registry::get('config');
-			if(isset($config->labels)) {
-				if($config->labels->loadWith=='view') {
-					$labelManager=LabelManager::getInstance();
-					$labelManager->loadLabels(Registry::get('locale'));
-				}
-			}
 			$view=View::factory($config->view->engine);
 			$view->setResponse($this->_response);
 			return $view;
@@ -399,10 +393,10 @@ class Front extends Singleton {
 	}
 
 	// called after action
-	public function postAction() {
+	public function postLaunchAction() {
 		$reflected = new \ReflectionClass($this->_controllerInstance);
-		if($reflected->hasMethod($this->_actionName . 'Action')) {
-			call_user_func(array($this->_controllerInstance, 'postAction'), null);
+		if($reflected->hasMethod('postLaunchAction')) {
+			call_user_func(array($this->_controllerInstance, 'postLaunchAction'), null);
 		}
 	}
 

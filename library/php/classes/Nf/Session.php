@@ -40,6 +40,8 @@ abstract class Session extends Singleton
 	    session_start();
 		//session_regenerate_id(true);
 	    Registry::set('session', $sessionHandler);
+
+
 	    return $sessionHandler;
 	}
 

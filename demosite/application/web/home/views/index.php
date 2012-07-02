@@ -1,2 +1,2 @@
-<?php echo $L_BONJOUR ?> <?php echo $str ?> <em>via PHP</em>
+<?php echo $labels->HELLO . ' ' . $str ?> <em>via PHP</em>
 

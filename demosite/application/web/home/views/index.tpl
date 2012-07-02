@@ -1,1 +1,1 @@
-{{#L_BONJOUR#}} {{$str}} <em>via Smarty</em>
+{{$str}} <em>via Smarty</em>

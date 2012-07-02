@@ -471,15 +471,7 @@ class Bootstrap {
 				$front->setSession(Session::start());
 
 				$labelManager=LabelManager::getInstance();
-				$config=\Nf\Registry::get('config');
-				if(isset($config->labels)) {
-					if($config->labels->loadWith=='bootstrap') {
-						$labelManager->loadLabels(Registry::get('locale'));
-					}
-				}
-				else {
-					$labelManager->loadLabels(Registry::get('locale'));
-				}
+				$labelManager->loadLabels(Registry::get('locale'));
 
 				$testDispatch=$front->dispatch();
 
@@ -492,7 +484,7 @@ class Bootstrap {
 							if(!$front->response->isRedirect())
 								$front->launchAction();
 							if(!$front->response->isRedirect())
-								$front->postAction();
+								$front->postLaunchAction();
 							$response->sendResponse();
 						}
 					}

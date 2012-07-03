@@ -392,5 +392,12 @@ class Input
 			return ($value==$instance->_fields[$compareField]['value']);
 		}
 	}
+	
+	public static function validateUrl($value) {
+		if(($url = parse_url($value)) && !empty($url['scheme']) && !empty($url['host'])) {
+			return true;
+		}
+		return false;		
+	}
 
 }

@@ -438,7 +438,7 @@ class Bootstrap {
 			if($testDispatch) {
 				$front->init();
 				$front->launchAction();
-				$front->postAction();
+				$front->postLaunchAction();
 				$response->sendResponse();
 			}
 			else {

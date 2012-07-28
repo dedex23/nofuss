@@ -294,7 +294,7 @@ class Bootstrap {
 					 	break;
 					case '-a':
 					case '--action':
-					 	$inAction=$_SERVER['argv'][$ac+1];
+					 	$inAction=ltrim($_SERVER['argv'][$ac+1], '/');
 					 	$ac+=2;
 					 	$showUsage=false;
 					 	break;
@@ -303,62 +303,6 @@ class Bootstrap {
 						break;
 				}
 			}
-
-			// chaînes possibles
-			// module/controller/action/variable1/valeur1/variable2/valeur2
-			// on vérifie qu'on a au moins 2 slashes
-			/*
-			if(mb_substr_count($inAction, '/')>=2) {
-
-				if(substr($inAction, 0, 1)=='/') {
-					$inAction = substr($inAction, 1);
-				}
-				// on enlève le trailing slash si présent
-				if(substr($inAction, -1, 1)=='/') {
-					$inAction = substr($inAction, 0, strlen($inAction)-1);
-				}
-
-				$showUsage=false;
-
-				preg_match_all('/([a-z0-9]+)\/([a-z0-9]+)\/([a-z0-9]+)\/?(.*)/i', $inAction, $query, PREG_PATTERN_ORDER);
-				if(count($query)>=3) {
-
-					$module=$query[1][0];
-					$controller=$query[2][0];
-					$action=$query[3][0];
-
-					if(!empty($query[4][0])) {
-						$params=$query[4][0];
-
-						// on enlève le premier point d'interrogation si présent
-						if(mb_substr($params, 0, 1)=='?') {
-							$params=mb_substr($params, 1);
-						}
-
-						// si on envoie des variables avec des var1=val1
-						if(mb_substr_count($params, '=')>=1) {
-							preg_match_all('/([a-z0-9_]+)=([^\/&]*)/i', $params, $arrParamsSlash, PREG_SET_ORDER);
-							for ($matchi = 0; $matchi < count($arrParamsSlash); $matchi++) {
-								$arrParams[$arrParamsSlash[$matchi][1]] = $arrParamsSlash[$matchi][2];
-							}
-						}
-						else {
-							// si on envoie des variables avec des /
-							if(mb_substr_count($params, '/')%2==1) {
-								preg_match_all('/([a-z0-9_]+)\/([a-z0-9_]*)/i', $params, $arrParamsSlash, PREG_SET_ORDER);
-								for ($matchi = 0; $matchi < count($arrParamsSlash); $matchi++) {
-									$arrParams[$arrParamsSlash[$matchi][1]] = $arrParamsSlash[$matchi][2];
-									//$params=str_replace($params, $arr_params_slash[$matchi][1] . '/' . $arr_params_slash[$matchi][2], '');
-								}
-							}
-						}
-					}
-					else {
-						$params=array();
-					}
-				}
-			}
-			*/
 		}
 
 		if(!$showUsage) {

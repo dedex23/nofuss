@@ -324,6 +324,14 @@ class Front extends Singleton {
 				$this->_request->setParam($routeParams[$refi], $refs[$refi+1]);
 			}
 		}
+		// is another fixed input parameter given in our route ?
+		if(count($refs)-1<count($routeParams)) {
+			foreach($routeParams as $forcedParam=>$forcedValue) {
+				if(!is_int($forcedParam)) {
+					$this->_request->setParam($forcedParam, $forcedValue);
+				}
+			}
+		}
 	}
 
 	public function getView() {

@@ -263,8 +263,11 @@ class Bootstrap {
 
 		if (isset($_SERVER['argv']) && $_SERVER['argc'] >= 2) {
 
+			$urlIni = Ini::parse(Registry::get('applicationPath') . '/configs/url.ini', true);
+			Registry::set('urlIni', $urlIni);
+
 			$inEnvironment='dev';
-			$inLocale='en';
+			$inLocale=$urlIni->i18n->defaultLocale;
 			$inVersion='cli';
 			$inAction=null;
 

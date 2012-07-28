@@ -148,7 +148,7 @@ class Input
 						$optionFunction=$optionValues[0];
 						$optionParameter=$optionValues[1];
 					}
-					elseif($this->is_assoc($option)) {
+					elseif($this->isAssoc($option)) {
 						// call with an alias only : array('isValidId' => '\App\Toto::validateId'),
 						$optionKeys=array_keys($option);
 						$optionValues=array_values($option);
@@ -256,7 +256,7 @@ class Input
 		return $this->_fields[$paramName]['value'];
 	}
 
-	private function is_assoc($array) {
+	private function isAssoc($array) {
 		return is_array($array) && array_diff_key($array, array_keys(array_keys($array)));
 	}
 
@@ -392,12 +392,12 @@ class Input
 			return ($value==$instance->_fields[$compareField]['value']);
 		}
 	}
-	
+
 	public static function validateUrl($value) {
 		if(($url = parse_url($value)) && !empty($url['scheme']) && !empty($url['host'])) {
 			return true;
 		}
-		return false;		
+		return false;
 	}
 
 }

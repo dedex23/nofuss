@@ -25,7 +25,7 @@ class Http extends AbstractRequest
 		// this option only allows us to use Alpha-numeric text, Tilde: ~, Period: ., Colon: :, Underscore: _, Dash: -
 		$config=\Nf\Registry::get('config');
 		if(isset($config->security->restrictCharactersInUrl) && $config->security->restrictCharactersInUrl) {
-			if (preg_match('%[\w0-9~.,/@\-=[\]{}|&?!]*%i', $this->_uri, $regs)) {
+			if (preg_match('%[\w0-9~.,/@\-=:[\]{}|&?!]*%i', $this->_uri, $regs)) {
 				if($this->_uri==$regs[0]) {
 					return true;
 				}

@@ -99,6 +99,7 @@ class Bootstrap {
 		else {
 			$locale=$inLocale;
 		}
+
 		// if we did not find the locale, we use the default value
 		if($locale==null) {
 			if(!empty($urlIni->i18n->defaultLocale)) {
@@ -111,12 +112,13 @@ class Bootstrap {
 		// we match the locale with the defined locale
 		$localeFound=false;
 		foreach($urlIni->locales as $definedLocale=>$definedLocaleNames) {
-			if(strpos($definedLocaleNames, $locale)) {
+			if(strpos(trim($definedLocaleNames), trim($locale))!==false) {
 				$locale=$definedLocale;
 				$localeFound=true;
 				break;
 			}
 		}
+
 		// if the detected locale was not found in our defined locales
 		if(!$localeFound) {
 			// reverting to the default locale

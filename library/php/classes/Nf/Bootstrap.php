@@ -68,6 +68,10 @@ class Bootstrap {
 								// vérification de la syntaxe par une regexp
 								if(preg_match('/[a-z]+[_\-]?[a-z]+[_\-]?[a-z]+/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $matches)) {
 									$locale=strtolower(str_replace('-', '_', $matches[0]));
+									if(!empty($_SERVER['HTTP_HOST'])) {
+										$httpHost=strtolower($_SERVER['HTTP_HOST']);
+										list($localeFromUrl, $versionFromUrl, $redirectToHost)=$this->getLocaleAndVersionFromUrl($httpHost, $urlIni);
+									}
 								}
 							}
 							break;
@@ -169,7 +173,6 @@ class Bootstrap {
 		$config = Ini::parse(Registry::get('applicationPath') . '/configs/config.ini', true, $locale . '_' . $environment . '_' . $version);
 		Registry::set('config', $config);
 
-
 		if(!empty($redirectToHost)) {
 			header("HTTP/1.1 301 Moved Permanently");
 			header("Location: http://" . $redirectToHost . $_SERVER['REQUEST_URI']);
@@ -224,9 +227,11 @@ class Bootstrap {
 								$httpHostsToTest=array(str_replace('..', '.', str_replace('[version]', $prefix, $suffix)));
 							}
 						}
+
 						// le test sur la chaîne reconstruite
 						foreach($httpHostsToTest as $httpHostToTest) {
 							if($httpHost==$httpHostToTest) {
+
 								$localeFromUrl=$locale;
 								$versionFromUrl=$version_name;
 								if($locale=='_default') {
@@ -328,7 +333,6 @@ class Bootstrap {
 			echo "\nUse quotes (\") if you use the usual method ?var=value\n";
 			exit (04);
 		}
-
 	}
 
 	function redirectForUserAgent(){
@@ -355,8 +359,6 @@ class Bootstrap {
 		}
 		return false;
 	}
-
-
 
 	function go(){
 		if(php_sapi_name()=='cli') {

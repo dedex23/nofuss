@@ -15,7 +15,6 @@ class Bootstrap {
 	}
 
 	public function initHttpEnvironment($inEnvironment=null, $inLocale=null, $inVersion=null) {
-
 		$urlIni = Ini::parse(Registry::get('applicationPath') . '/configs/url.ini', true);
 		Registry::set('urlIni', $urlIni);
 
@@ -205,6 +204,8 @@ class Bootstrap {
 				if(!$found) {
 					$redirectToHost=null;
 					foreach($urlIni->suffixes as $locale=>$suffix) {
+						// the hosts names to test
+						$httpHostsToTest=array();
 						if($prefix=='') {
 							$httpHostsToTest=array(str_replace('[version]', '', $suffix));
 						}
@@ -224,7 +225,8 @@ class Bootstrap {
 							}
 							else {
 								$redirectToHost=null;
-								$httpHostsToTest=array(str_replace('..', '.', str_replace('[version]', $prefix, $suffix)));
+								$httpHostsToTest[]=str_replace('..', '.', str_replace('[version]', $prefix, $suffix));
+								$httpHostsToTest[]=str_replace('..', '.', str_replace('[version]', $prefix . '.', $suffix));
 							}
 						}
 
@@ -395,7 +397,6 @@ class Bootstrap {
 			else {
 				throw new \Exception ('Action not found : ' . $uri);
 			}
-
 		}
 		else {
 			$this->initHttpEnvironment();

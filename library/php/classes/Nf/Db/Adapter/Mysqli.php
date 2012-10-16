@@ -8,7 +8,7 @@ class Mysqli extends AbstractAdapter
 	protected $_resourceClass='\\Nf\\Db\\Resource\\Mysqli';
 
     protected function _connect() {
-        if ($this->_connection) {
+        if ($this->_connection /*&& $this->_connection->ping()*/) {
             return;
         }
 

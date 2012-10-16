@@ -53,6 +53,7 @@ abstract class Cache
 	}
 
 	public static function isCacheEnabled() {
+		$config=Registry::get('config');
 		return isset($config->cache->enabled)?(bool)$config->cache->enabled:true;
 	}
 

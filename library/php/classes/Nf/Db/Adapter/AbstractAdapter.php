@@ -10,6 +10,8 @@ abstract class AbstractAdapter
     protected $_connection = null;
 	
 	protected $_autoQuoteIdentifiers = true;
+	
+	protected $_cache = false;
 
     public function __construct($config) {
         if (!is_array($config)) {
@@ -27,43 +29,90 @@ abstract class AbstractAdapter
     }
 
     public function query($sql) {
-        $this->_connect();
-        $res = new $this->_resourceClass($sql, $this);
-        $res->execute();
+		$this->_connect();
+		$res = new $this->_resourceClass($sql, $this);
+		$res->execute();
+		
         return $res;
     }
 	
 	public function fetchAll($sql) {
-		$stmt = $this->query($sql);
-        $result = $stmt->fetchAll();
+		$cacheKey = md5($sql).'All';
+
+		if(($result = $this->_getCachedResult($cacheKey))===false) {
+			$stmt = $this->query($sql);
+			$result = $stmt->fetchAll(\Nf\Db::FETCH_ASSOC);
+			$this->_setCachedResult($cacheKey, $result);
+		}
+		$this->disableCache();
         return $result;
 	}
 	
-	public function fetchRow($sql) {
-        $stmt = $this->query($sql);
-        $result = $stmt->fetch();
+	public function fetchAssoc($sql) {
+		$cacheKey = md5($sql).'Assoc';
+
+		if(($result = $this->_getCachedResult($cacheKey))===false) {
+			$stmt = $this->query($sql);
+			$result = array();
+			while($row = $stmt->fetch(\Nf\Db::FETCH_ASSOC)) {
+				$tmp = array_values(array_slice($row, 0, 1));
+				$result[$tmp[0]] = $row;
+			}
+			$this->_setCachedResult($cacheKey, $result);
+		}
+		$this->disableCache();
+        return $result;
+	}
+	
+	public function fetchRow($sql) {		
+		$cacheKey = md5($sql).'Row';
+
+		if(($result = $this->_getCachedResult($cacheKey))===false) {
+			$stmt = $this->query($sql);
+			$result = $stmt->fetch();
+			$this->_setCachedResult($cacheKey, $result);
+		}
+		$this->disableCache();
         return $result;
     }
 	
 	public function fetchCol($sql) {
-        $stmt = $this->query($sql);
-        $result = $stmt->fetchAll(\Nf\Db::FETCH_COLUMN, 0);
+        $cacheKey = md5($sql).'Col';
+
+		if(($result = $this->_getCachedResult($cacheKey))===false) {
+			$stmt = $this->query($sql);
+			$result = $stmt->fetchAll(\Nf\Db::FETCH_COLUMN, 0);
+			$this->_setCachedResult($cacheKey, $result);
+		}
+		$this->disableCache();
         return $result;
     }
 	
 	public function fetchOne($sql) {
-        $stmt = $this->query($sql);
-        $result = $stmt->fetchColumn(0);
+		$cacheKey = md5($sql).'Col';
+
+		if(($result = $this->_getCachedResult($cacheKey))===false) {
+			$stmt = $this->query($sql);
+			$result = $stmt->fetchColumn(0);
+			$this->_setCachedResult($cacheKey, $result);
+		}
+		$this->disableCache();
         return $result;
     }
 	
 	public function fetchPairs($sql) {
-        $stmt = $this->query($sql);
-        $data = array();
-        while ($row = $stmt->fetch(\Nf\Db::FETCH_NUM)) {
-            $data[$row[0]] = $row[1];
-        }
-        return $data;
+		$cacheKey = md5($sql).'Pairs';
+
+		if(($result = $this->_getCachedResult($cacheKey))===false) {
+			$stmt = $this->query($sql);
+			$result = array();
+			while ($row = $stmt->fetch(\Nf\Db::FETCH_NUM)) {
+				$result[$row[0]] = $row[1];
+			}			
+			$this->_setCachedResult($cacheKey, $result);
+		}
+		$this->disableCache();
+        return $result;
     } 
 	
 	public function beginTransaction() {
@@ -81,7 +130,36 @@ abstract class AbstractAdapter
 		return $this;
 	}
 	
-
+	public function enableCache($lifetime=\Nf\Cache::DEFAULT_LIFETIME, $cacheKey=null) {
+		$this->_cache = array(
+			'lifetime'	=> $lifetime
+		);
+		if($cacheKey!==null) 
+			$this->_cache['key'] = $cacheKey;
+		return $this;
+	}
+	public function disableCache() {
+		$this->_cache = false;
+		return $this;
+	}
+	
+	protected function _getCachedResult($cacheKey) {
+		if($this->_cache !== false) {
+			$cache = \Nf\Front::getInstance()->getCache('global');
+			$cacheKey = isset($this->_cache['key']) ? $this->_cache['key'] : $cacheKey;
+			return $cache->load('sql', $cacheKey);
+		}
+		return false;		
+	}
+	
+	protected function _setCachedResult($cacheKey, $result) {
+		if($this->_cache !== false) {
+			$cache = \Nf\Front::getInstance()->getCache('global');
+			$cacheKey = isset($this->_cache['key']) ? $this->_cache['key'] : $cacheKey;
+			return $cache->save('sql', $cacheKey, $result, $this->_cache['lifetime']);
+		}
+		return false;		
+	}
 	
 
     protected function _quote($value) {

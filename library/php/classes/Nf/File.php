@@ -41,7 +41,7 @@ abstract class File
 			if($unlink_src)
 				@unlink($src);
 		}
-		return $ret;
+		return ($ret===0);
 	}
 
 	public static function generatePath($input){

@@ -29,7 +29,6 @@ abstract class File
 		$mimeType = finfo_file($finfo, $src);
 		finfo_close($finfo);
 
-		$ret = false;
 		switch($mimeType) {
 			case 'application/x-gzip':
 				exec('gzip -dcf ' . $src . ($dest!==null ? ' > '.$dest : ''), $out, $ret);
@@ -37,7 +36,6 @@ abstract class File
 		}
 
 		if(isset($ret) && $ret===0) {
-			$ret = true;
 			if($unlink_src)
 				@unlink($src);
 		}

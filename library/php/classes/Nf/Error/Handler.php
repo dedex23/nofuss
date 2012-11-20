@@ -149,7 +149,9 @@ class Handler extends \Exception
 									$config->error->forward->controller,
 									$config->error->forward->action
 									)) {
-						trigger_error($str);
+						echo '** Nf: Cannot instantiate error module, printing error message **' . PHP_EOL . PHP_EOL;
+						//$response->displayError($str);
+						echo PHP_EOL;
 					}
 					return true;
 				}

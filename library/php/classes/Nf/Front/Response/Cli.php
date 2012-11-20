@@ -17,7 +17,6 @@ class Cli extends AbstractResponse
         return false;
     }
 
-
     public function setHttpResponseCode($code) {
         return true;
     }

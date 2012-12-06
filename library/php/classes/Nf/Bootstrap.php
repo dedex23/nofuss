@@ -389,9 +389,10 @@ class Bootstrap {
 			$testDispatch=$front->dispatch();
 
 			if($testDispatch) {
-				$front->init();
-				$front->launchAction();
-				$front->postLaunchAction();
+				if($front->init()!==false) {
+					$front->launchAction();
+					$front->postLaunchAction();
+				}
 				$response->sendResponse();
 			}
 			else {
@@ -399,6 +400,7 @@ class Bootstrap {
 			}
 		}
 		else {
+
 			$this->initHttpEnvironment();
 			Error\Handler::setErrorDisplaying();
 
@@ -430,13 +432,18 @@ class Bootstrap {
 				$requestIsClean=$request->sanitizeUri();
 
 				if($requestIsClean) {
+
 					if($testDispatch===true) {
+
+						$request->setPutFromRequest();
+
 						if(!$request->redirectForTrailingSlash()) {
-							$front->init();
-							if(!$front->response->isRedirect())
-								$front->launchAction();
-							if(!$front->response->isRedirect())
-								$front->postLaunchAction();
+							if($front->init()!==false) {
+								if(!$front->response->isRedirect())
+									$front->launchAction();
+								if(!$front->response->isRedirect())
+									$front->postLaunchAction();
+							}
 							$response->sendResponse();
 						}
 					}

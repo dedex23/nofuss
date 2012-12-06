@@ -6,6 +6,7 @@ class Http extends AbstractRequest
 {
 
 	protected $_params=array();
+	private $_put=null;
 
 	public function __construct() {
 		if(!empty($_SERVER['REDIRECT_URL'])) {
@@ -80,6 +81,32 @@ class Http extends AbstractRequest
         }
         return $return;
     }
+
+	// get the string sent as put
+	public function setPutFromRequest() {
+		if($this->_put===null) {
+			if($_SERVER['REQUEST_METHOD'] == 'PUT') {
+				parse_str(file_get_contents("php://input"), $putVars);
+				foreach($putVars as $key=>$val) {
+					$this->_put = $key;
+					return;
+				}
+			}
+		}
+		else {
+			$this->_put='';
+		}
+	}
+
+
+	public function getPut($jsonDecode='assoc') {
+		if($jsonDecode=='assoc') {
+			return json_decode($this->_put, true);
+		}
+		else {
+			return $this->_put;
+		}
+	}
 
     // handle the redirection according to the trailing slash configuration
 	public function redirectForTrailingSlash(){

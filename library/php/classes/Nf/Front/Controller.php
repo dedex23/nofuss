@@ -41,7 +41,7 @@ class Controller {
 
 	// called after dispatch
 	public function init() {
-
+		return true;
 	}
 
 	// called after action

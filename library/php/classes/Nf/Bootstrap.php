@@ -2,6 +2,8 @@
 
 namespace Nf;
 
+use Nf\Localization;
+
 class Bootstrap {
 
 	const DEFAULT_LOCALESELECTIONORDER='cookie,url,browser';
@@ -55,7 +57,7 @@ class Bootstrap {
 			$localeSelectionOrder=self::DEFAULT_LOCALESELECTIONORDER;
 		}
 		$localeSelectionOrderArray=(array)explode(',', $localeSelectionOrder);
-		// 3 possibilities : suivant l'url ou suivant un cookie ou suivant la langue du navigateur (fonctionnement indiqué dans i18n de config.ini)
+		// 3 possibilities : suivant l'url ou suivant un cookie ou suivant la langue du navigateur (fonctionnement indiqué dans i18n de url.ini)
 		if(empty($inLocale)) {
 			$locale=null;
 			foreach($localeSelectionOrderArray as $localeSelectionMethod) {
@@ -66,7 +68,8 @@ class Bootstrap {
 							if(!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 								// vérification de la syntaxe par une regexp
 								if(preg_match('/[a-z]+[_\-]?[a-z]+[_\-]?[a-z]+/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $matches)) {
-									$locale=strtolower(str_replace('-', '_', $matches[0]));
+									// $locale=strtolower(str_replace('-', '_', $matches[0]));
+									$locale=Localization::normalizeLocale($matches[0]);
 									if(!empty($_SERVER['HTTP_HOST'])) {
 										$httpHost=strtolower($_SERVER['HTTP_HOST']);
 										list($localeFromUrl, $versionFromUrl, $redirectToHost)=$this->getLocaleAndVersionFromUrl($httpHost, $urlIni);
@@ -91,7 +94,7 @@ class Bootstrap {
 							if(!empty($_COOKIE['_nfLc'])) {
 								// vérification de la syntaxe par une regexp
 								if(preg_match('/[a-z]+[_\-]?[a-z]+[_\-]?[a-z]+/i', $_COOKIE['_nfLc'], $matches)) {
-									$locale=strtolower(str_replace('_', '-', $matches[0]));
+									$locale=Localization::normalizeLocale($matches[0]);
 								}
 							}
 							break;
@@ -115,10 +118,24 @@ class Bootstrap {
 		// we match the locale with the defined locale
 		$localeFound=false;
 		foreach($urlIni->locales as $definedLocale=>$definedLocaleNames) {
-			if(strpos(trim($definedLocaleNames), trim($locale))!==false) {
-				$locale=$definedLocale;
-				$localeFound=true;
-				break;
+			if(!$localeFound) {
+				if(strpos($definedLocaleNames, '|')) {
+					$arrDefinedLocaleNames=explode('|', $definedLocaleNames);
+					foreach($arrDefinedLocaleNames as $localeNameOfArr) {
+						if(trim($localeNameOfArr)==trim($locale)) {
+							$locale=trim($definedLocale);
+							$localeFound=true;
+							break;
+						}
+					}
+				}
+				else {
+					if(trim($definedLocaleNames)==trim($locale)) {
+						$locale=trim($definedLocale);
+						$localeFound=true;
+						break;
+					}
+				}
 			}
 		}
 
@@ -169,7 +186,7 @@ class Bootstrap {
 		Registry::set('version', $version);
 
 		// on lit le config.ini à la section concernée par notre environnement
-		$config = Ini::parse(Registry::get('applicationPath') . '/configs/config.ini', true, $locale . '_' . $environment . '_' . $version);
+		$config = Ini::parse(Registry::get('applicationPath') . '/configs/config.ini', true, $locale . '_' . $environment . '_' . $version, 'common');
 		Registry::set('config', $config);
 
 		if(!empty($redirectToHost)) {

@@ -12,8 +12,13 @@ class LabelManager extends Singleton {
 	// load the labels
 	public function loadLabels($locale) {
 		if(!$this->_labelsLoaded) {
-			$this->_labels=parse_ini_file(\Nf\Registry::get('applicationPath') . '/labels/' . $locale . '.ini', true);
-			$this->_labelsLoaded=true;
+			if(file_exists(\Nf\Registry::get('applicationPath') . '/labels/' . $locale . '.ini')) {
+				$this->_labels=parse_ini_file(\Nf\Registry::get('applicationPath') . '/labels/' . $locale . '.ini', true);
+				$this->_labelsLoaded=true;
+			}
+			else {
+				throw new \Exception('Cannot load labels for this locale (' . $locale . ')');
+			}
 		}
 	}
 

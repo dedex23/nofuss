@@ -38,7 +38,7 @@ class Ini
 	 * @throws Exception
 	 * @return array|boolean
 	 */
-	public static function parse($filename, $process_sections = false, $section_name = null)
+	public static function parse($filename, $process_sections = false, $section_name = null, $fallback_section_name=null)
 	{
 		// load the raw ini file
 		$ini = parse_ini_string(file_get_contents($filename), $process_sections);
@@ -69,7 +69,13 @@ class Ini
 				if (isset(self::$_result[$section_name])) {
 					return self::bindArrayToObject(self::$_result[$section_name]);
 				} else {
-					throw new \Exception('Section ' . $section_name . ' not found in the ini file');
+					if($fallback_section_name!==null) {
+						return self::bindArrayToObject(self::$_result[$fallback_section_name]);
+					}
+					else {
+						throw new \Exception('Section ' . $section_name . ' not found in the ini file');
+					}
+
 				}
 			}
 		}

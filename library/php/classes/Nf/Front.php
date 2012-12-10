@@ -167,61 +167,65 @@ class Front extends Singleton {
 
 							if(file_exists($filename)) {
 								require_once($filename);
+								
 								if(isset($_routes)) {
 
 									for($i=count($_routes)-1; $i>=0; $i--){
-										$route=$_routes[$i];
-										// default type is "default"
-										$requestType='default';
-										// if a specific type is requested
-										if(is_array($route[0])) {
-											$requestType=$route[0][0];
-										}
-										switch($requestType) {
-											case 'default':
-												// tester si match, sinon on continue jusqu'à ce qu'on trouve
-												if(preg_match('#^' . $route[0] . '#', $uri, $result)) {
-													// on teste la présence du module controller action indiqué dans la route
-													if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
-														if(isset($route[2])) {
-															$this->associateParams($route[2], $result);
+										if(!$foundController) {
+											$route=$_routes[$i];
+											// default type is "default"
+											$requestType='default';
+											// if a specific type is requested
+											if(is_array($route[0])) {
+												$requestType=$route[0][0];
+											}
+											switch($requestType) {
+												case 'default':												
+												
+													// tester si match, sinon on continue jusqu'à ce qu'on trouve
+													if(preg_match('#^' . $route[0] . '#', $uri, $result)) {
+														// on teste la présence du module controller action indiqué dans la route
+														if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $route[1][2])) {
+															if(isset($route[2])) {
+																$this->associateParams($route[2], $result);
+															}
+															break;
 														}
-														break;
 													}
-												}
-												break;
-											case 'rest':
-												if(preg_match('#^' . $route[0][1] . '#', $uri, $result)) {
-													// on teste la présence du module controller action indiqué dans la route
-													// action par défaut : get
-													if (isset($_SERVER['REQUEST_METHOD'])) {
-														$action=strtolower($_SERVER['REQUEST_METHOD']);
-													}
-													if($_SERVER['REQUEST_METHOD']=='POST') {
-														// overloading the method with the "method" parameter if the request is POST
-														if(isset($_POST['method'])) {
-															$action=$_POST['method'];
+													break;
+												case 'rest':
+													if(preg_match('#^' . $route[0][1] . '#', $uri, $result)) {
+														// on teste la présence du module controller action indiqué dans la route
+														// action par défaut : get
+														if (isset($_SERVER['REQUEST_METHOD'])) {
+															$action=strtolower($_SERVER['REQUEST_METHOD']);
 														}
-														// overloading the method with http headers
-														// X-HTTP-Method (Microsoft) or X-HTTP-Method-Override (Google/GData) or X-METHOD-OVERRIDE (IBM)
-														$acceptableOverridingHeaders=array('HTTP_X_HTTP_METHOD', 'HTTP_X_HTTP_METHOD_OVERRIDE', 'HTTP_X_METHOD_OVERRIDE');
-														foreach($acceptableOverridingHeaders as $overridingHeader) {
-															if(isset($_SERVER[$overridingHeader])) {
-																$action=$_SERVER[$overridingHeader];
+														if($_SERVER['REQUEST_METHOD']=='POST') {
+															// overloading the method with the "method" parameter if the request is POST
+															if(isset($_POST['method'])) {
+																$action=$_POST['method'];
+															}
+															// overloading the method with http headers
+															// X-HTTP-Method (Microsoft) or X-HTTP-Method-Override (Google/GData) or X-METHOD-OVERRIDE (IBM)
+															$acceptableOverridingHeaders=array('HTTP_X_HTTP_METHOD', 'HTTP_X_HTTP_METHOD_OVERRIDE', 'HTTP_X_METHOD_OVERRIDE');
+															foreach($acceptableOverridingHeaders as $overridingHeader) {
+																if(isset($_SERVER[$overridingHeader])) {
+																	$action=$_SERVER[$overridingHeader];
+																}
 															}
 														}
-													}
-													if(isset($route[1][2])) {
-														$action=$route[1][2];
-													}
-													if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $action)) {
-														if(isset($route[2])) {
-															$this->associateParams($route[2], $result);
+														if(isset($route[1][2])) {
+															$action=$route[1][2];
 														}
-														break;
+														if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $action)) {
+															if(isset($route[2])) {
+																$this->associateParams($route[2], $result);
+															}
+															break;
+														}
 													}
-												}
-												break;
+													break;
+											}
 										}
 									}
 									unset($_routes);

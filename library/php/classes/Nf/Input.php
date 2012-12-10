@@ -255,6 +255,10 @@ class Input
 	public function __get($paramName) {
 		return $this->_fields[$paramName]['value'];
 	}
+	
+	public function __isset($paramName) {
+		return isset($this->_fields[$paramName]['value']);
+	}
 
 	private function isAssoc($array) {
 		return is_array($array) && array_diff_key($array, array_keys(array_keys($array)));

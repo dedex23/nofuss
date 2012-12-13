@@ -2,6 +2,8 @@
 
 namespace Nf\Db\Adapter;
 
+use Nf\Localization;
+
 class Mysqli extends AbstractAdapter
 {
 
@@ -96,7 +98,7 @@ class Mysqli extends AbstractAdapter
 		$mysqli = $this->_connection;
         return (string) $mysqli->insert_id;
     }
-	
+
 	public function insert($tableName, array $bind) {
 
 		$sql="INSERT INTO " . $this->quoteIdentifier($tableName, true) . " SET ";
@@ -138,15 +140,15 @@ class Mysqli extends AbstractAdapter
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
 	}
-	
+
 	public function delete($tableName, $where = '') {
-		
+
 		if($where!='') {
 			$sql="DELETE FROM " . $this->quoteIdentifier($tableName, true) . " WHERE " . $where;
 		} else {
 			$sql="TRUNCATE TABLE" . $this->quoteIdentifier($tableName, true);
 		}
-		
+
 		$res=$this->query($sql);
         return $this->getConnection()->affected_rows;
     }
@@ -174,11 +176,21 @@ class Mysqli extends AbstractAdapter
 		if(is_array($queries)) {
 			$queries = implode(';', $queries);
 		}
-		
+
 		$ret=$mysqli->multi_query($queries);
 
 		if($ret===false) {
 			throw new \Exception($mysqli->error);
+		}
+	}
+
+	public static function formatDate($inShortFormatDateOrTimestamp, $hasMinutes=false) {
+		$tstp=Localization::dateToTimestamp($inShortFormatDateOrTimestamp, Localization::SHORT, ($hasMinutes ? Localization::SHORT : Localization::NONE));
+		if($hasMinutes) {
+			return date('Y-m-d', $tstp);
+		}
+		else {
+			return date('Y-m-d H:i:s', $tstp);
 		}
 	}
 

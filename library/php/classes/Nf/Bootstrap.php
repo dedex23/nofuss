@@ -403,6 +403,9 @@ class Bootstrap {
 			$labelManager=LabelManager::getInstance();
 			$labelManager->loadLabels(Registry::get('locale'));
 
+			$localization=Localization::getInstance();
+			$localization->setLocale(Registry::get('locale'));
+
 			$testDispatch=$front->dispatch();
 
 			if($testDispatch) {
@@ -443,6 +446,9 @@ class Bootstrap {
 
 				$labelManager=LabelManager::getInstance();
 				$labelManager->loadLabels(Registry::get('locale'));
+
+				$localization=Localization::getInstance();
+				Localization::setLocale(Registry::get('locale'));
 
 				$testDispatch=$front->dispatch();
 

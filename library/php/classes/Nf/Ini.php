@@ -40,6 +40,7 @@ class Ini
 	 */
 	public static function parse($filename, $process_sections = false, $section_name = null, $fallback_section_name=null)
 	{
+
 		// load the raw ini file
 		$ini = parse_ini_string(file_get_contents($filename), $process_sections);
 

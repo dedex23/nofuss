@@ -86,11 +86,7 @@ class Http extends AbstractRequest
 	public function setPutFromRequest() {
 		if($this->_put===null) {
 			if($_SERVER['REQUEST_METHOD'] == 'PUT') {
-				parse_str(file_get_contents("php://input"), $putVars);
-				foreach($putVars as $key=>$val) {
-					$this->_put = $key;
-					return;
-				}
+				$this->_put=file_get_contents("php://input");
 			}
 		}
 		else {

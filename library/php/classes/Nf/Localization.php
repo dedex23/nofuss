@@ -40,6 +40,22 @@ class Localization extends Singleton
 		return $fmt->format($timestamp);
 	}
 
+	// syntax can be found on : http://userguide.icu-project.org/formatparse/datetime
+	public static function formatOther($timestamp, $format='eeee') {
+		$instance=self::$_instance;
+		$fmt=new IntlDateFormatter($instance->_currentLocale, 0, 0);
+		$fmt->setPattern($format);
+		return $fmt->format($timestamp);
+	}
+
+	public static function formatDay($timestamp, $fullName=true) {
+		return self::formatOther($timestamp, ($fullName?'EEEE':'EEE'));
+	}
+
+	public static function formatMonth($timestamp, $fullName=true) {
+		return self::formatOther($timestamp, ($fullName?'LLLL':'LLL'));
+	}
+
 	public static function formatCurrency($amount, $currency) {
 		$instance=self::$_instance;
 		$fmt = new NumberFormatter($instance->_currentLocale(), NumberFormatter::CURRENCY);

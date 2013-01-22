@@ -16,6 +16,7 @@ class Input
 	const F_STRING='string';
 	const F_TRIM='trim';
 	const F_URL='url';
+	const F_STRIPTAGS='stripTags';
 
 	const V_INTEGER='int';
 	const V_NATURAL='natural';
@@ -37,6 +38,7 @@ class Input
 	const V_MATCHES='matches';
 	const V_URL='url';
 	const V_DEFAULT='default';
+
 
 	private $_params=array();
 	private $_filters=array();
@@ -209,6 +211,11 @@ class Input
 						}
 						// add the validator to the validators for this field
 						if($metaAction=='validate') {
+							// special case of the default value
+							if($optionName==self::V_DEFAULT) {
+								$this->_fields[$paramName]['value']=$ret;
+								$ret=true;
+							}
 							$isValid=$isValid && $ret;
 							$validators[$optionName]=$ret;
 						}
@@ -255,7 +262,7 @@ class Input
 	public function __get($paramName) {
 		return $this->_fields[$paramName]['value'];
 	}
-	
+
 	public function __isset($paramName) {
 		return isset($this->_fields[$paramName]['value']);
 	}
@@ -300,6 +307,19 @@ class Input
 
 	public static function filterNumeric($value) {
 		return filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+	}
+
+	public static function filterStripTags($value) {
+		$containsTags=true;
+		$out=$value;
+		while($containsTags) {
+			$out2=strip_tags($out);
+			if($out2==$out) {
+				$containTags=false;
+			}
+			$out=$out2;
+		}
+		return $out;
 	}
 
 	public static function filterRegexp($value, $regexp) {
@@ -347,7 +367,7 @@ class Input
 	}
 
 	public static function validateNumeric($value) {
-		return ($this->filterNumeric($value)==$value);
+		return (self::filterNumeric($value)==$value);
 	}
 
 	public static function validateEquals($value, $check) {
@@ -402,6 +422,13 @@ class Input
 			return true;
 		}
 		return false;
+	}
+
+	public static function validateDefault($value, $defaultValue) {
+		if(empty($value)) {
+			return $defaultValue;
+		}
+		return $value;
 	}
 
 }

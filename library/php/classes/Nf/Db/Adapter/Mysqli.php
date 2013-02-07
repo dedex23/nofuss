@@ -185,7 +185,7 @@ class Mysqli extends AbstractAdapter
 	}
 
 	public static function formatDate($inShortFormatDateOrTimestamp, $hasMinutes=false) {
-		$tstp=Localization::dateToTimestamp($inShortFormatDateOrTimestamp, Localization::SHORT, ($hasMinutes ? Localization::SHORT : Localization::NONE));
+		$tstp=Localization::dateToTimestamp($inShortFormatDateOrTimestamp, Localization::SHORT, ($hasMinutes ? Localization::SHORT : Localization::NONE), true);
 		if($hasMinutes) {
 			return date('Y-m-d', $tstp);
 		}

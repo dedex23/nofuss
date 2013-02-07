@@ -68,9 +68,13 @@ class Localization extends Singleton
 		return $fmt->format($value);
 	}
 
-	public static function dateToTimestamp($date, $formatDate=self::SHORT, $formatTime=self::SHORT) {
+	public static function dateToTimestamp($date, $formatDate=self::SHORT, $formatTime=self::SHORT, $acceptISOFormat=false) {
 		if(self::isTimestamp($date)) {
 			return $date;
+		}
+		elseif($acceptISOFormat && self::isISOFormat($date)) {
+			$dt=new \DateTime($date);
+			return $dt->getTimestamp();
 		}
 		else {
 			$instance=self::$_instance;
@@ -83,7 +87,18 @@ class Localization extends Singleton
 				throw new \Exception('input date is in another format and is not recognized:' . $date);
 			}
 		}
+	}
 
+	public static function isISOFormat($date) {
+		if (preg_match('/\A(?:^([1-3][0-9]{3,3})-(0?[1-9]|1[0-2])-(0?[1-9]|[1-2][1-9]|3[0-1])\s([0-1][0-9]|2[0-4]):([0-5][0-9]):([0-5][0-9])$)\Z/im', $date)) {
+			return true;
+		}
+		elseif(preg_match('/\A(?:^([1-3][0-9]{3,3})-(0?[1-9]|1[0-2])-(0?[1-9]|[1-2][1-9]|3[0-1])$)\Z/im', $date)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public static function isTimestamp($timestamp) {

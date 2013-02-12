@@ -310,16 +310,7 @@ class Input
 	}
 
 	public static function filterStripTags($value) {
-		$containsTags=true;
-		$out=$value;
-		while($containsTags) {
-			$out2=strip_tags($out);
-			if($out2==$out) {
-				$containTags=false;
-			}
-			$out=$out2;
-		}
-		return $out;
+		return strip_tags($value);
 	}
 
 	public static function filterRegexp($value, $regexp) {

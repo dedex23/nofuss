@@ -58,13 +58,13 @@ class Localization extends Singleton
 
 	public static function formatCurrency($amount, $currency) {
 		$instance=self::$_instance;
-		$fmt = new NumberFormatter($instance->_currentLocale(), NumberFormatter::CURRENCY);
+		$fmt = new NumberFormatter($instance->_currentLocale, NumberFormatter::CURRENCY);
 		return $fmt->formatCurrency($amount, $currency);
 	}
 
 	public static function formatNumber($value) {
 		$instance=self::$_instance;
-		$fmt = new NumberFormatter($instance->_currentLocale(), NumberFormatter::DECIMAL);
+		$fmt = new NumberFormatter($instance->_currentLocale, NumberFormatter::DECIMAL);
 		return $fmt->format($value);
 	}
 

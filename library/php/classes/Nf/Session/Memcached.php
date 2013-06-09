@@ -48,7 +48,7 @@ class Memcached extends Session
     	return self::$_data;
     }
 
-    function write($sessionId, $data) {
+    function write($sessionId) {
         // This is called upon script termination or when session_write_close() is called, which ever is first.
         $cacheKey = Cache::getKeyName('session', $sessionId);
 		$result = $this->_memcache->set($cacheKey, self::$_data, false, $this->_lifeTime);

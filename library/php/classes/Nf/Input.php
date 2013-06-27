@@ -76,6 +76,7 @@ class Input
 	public function getMessages() {
 		$messages=array();
 		foreach($this->_fields as $fieldName=>$values) {
+
 			if(!$values['isValid']) {
 				$invalidators=array();
 				foreach($values['validators'] as $validatorName=>$validatorValue) {
@@ -114,7 +115,7 @@ class Input
 			$isValid=true;
 		}
 
-		foreach($metaSource as $paramName=>$options) {
+    foreach($metaSource as $paramName=>$options) {
 
 			if($metaAction=='filter') {
 				$this->setField($paramName, (isset($this->_params[$paramName]) ? $this->_params[$paramName] : null));
@@ -190,9 +191,9 @@ class Input
 						}
 						else {
 							$ret=$className::$methodName($this->_fields[$paramName]['value'], null, $this);
-						}
+            }
 						// add the validator to the validators for this field
-						$isValid=$isValid && $ret;
+            $isValid=$isValid && $ret;
 						$validators[$optionName]=$ret;
 					}
 				}
@@ -223,13 +224,22 @@ class Input
 					else {
 						throw new \Exception (__CLASS__ . ' hasn\'t a method called "' . $methodNameForOption . '"');
 					}
-				}
+        }
 			}
 			unset($option);
 
 			// we set the field after all the input value went through all validators
-			if($metaAction=='validate' && $validatorIndex==count($options)) {
-				$this->setField($paramName, false, $isValid, $validators);
+      if($metaAction=='validate' && $validatorIndex==count($options)) {
+
+        // we test for each params if one of validators is not valid.
+        $paramIsValid = true;
+        foreach($validators as $v){
+          if ( $v === false){
+            $paramIsValid = false;
+            break;
+          }
+        }
+				$this->setField($paramName, false, $paramIsValid, $validators);
 			}
 		}
 		if($metaAction=='validate') {

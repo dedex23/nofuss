@@ -384,7 +384,7 @@ class Input
 	}
 
 	public static function validateNotEmpty($value) {
-		return (!empty($value));
+		return !(trim($value) === '');
 	}
 
 	public static function validateGreaterThan($value, $compare) {

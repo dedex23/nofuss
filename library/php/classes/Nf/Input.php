@@ -283,17 +283,26 @@ class Input
 
 	// ************************************************************************
 	// filter functions
-	// ************************************************************************
+  // ************************************************************************
+
+ // used for int as string 
+  public static function filterNull($value){
+    if ( $value == '') return null;
+    return $value;
+  }
 
 	public static function filterInt($value) {
-		return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+    return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+    if ( $d == '')
+      return null;
+    return (int)$d;
 	}
 
 	public static function filterNatural($value) {
 		return abs(self::filterInt($value));
 	}
 
-	public static function filterNaturalNonZero($value) {
+  public static function filterNaturalNonZero($value) {
 		$natural=self::filterNatural($value);
 		if($natural!=0) {
 			return $natural;

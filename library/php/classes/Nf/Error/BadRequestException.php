@@ -27,5 +27,3 @@ class BadRequestException extends HttpException{
     return $this->_errors;
   }
 }
-
-?>

@@ -1,11 +1,14 @@
 <?php
 namespace Nf\Error;
 
+use Nf\Error\HttpException;
 
 /**
  * Gestion des exceptions pour le client avec passage d'array
  */
-class ClientException extends \Exception{
+class BadRequestException extends HttpException{
+
+	protected $_httpStatus = 400;
 
 	private $_errors = null;
 	/**

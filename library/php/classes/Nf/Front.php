@@ -23,7 +23,8 @@ class Front extends Singleton {
 	private $_actionName;
 
 	// pour le controller
-	private $_request;
+  private $_request;
+  private $_requestType;
 	private $_response;
 
 	private $_session;
@@ -38,7 +39,11 @@ class Front extends Singleton {
 	public function __get($var) {
 		$varName='_' . $var;
 		return $this->$varName;
-	}
+  }
+
+  public function getRequestType(){
+    return $this->_requestType;
+  }
 
 	public function getModuleName() {
 		return $this->_moduleName;
@@ -178,7 +183,10 @@ class Front extends Singleton {
 											// if a specific type is requested
 											if(is_array($route[0])) {
 												$requestType=$route[0][0];
-											}
+                      }
+
+                      $this->_requestType = $requestType;
+
 											switch($requestType) {
 												case 'default':
 
@@ -217,7 +225,7 @@ class Front extends Singleton {
 														if(isset($route[1][2])) {
 															$action=$route[1][2];
 														}
-														if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $action)) {
+                            if($foundController=$this->checkModuleControllerAction($route[1][0], $route[1][1], $action)) {
 															if(isset($route[2])) {
 																$this->associateParams($route[2], $result);
 															}
@@ -428,14 +436,32 @@ class Front extends Singleton {
 
 	// calls the actual action found from the routing system
 	public function launchAction() {
-		self::$obLevel = ob_get_level();
-        if(php_sapi_name()!='cli') {
-        	ob_start();
+    self::$obLevel = ob_get_level();
+
+    if(php_sapi_name()!='cli') {
+      ob_start();
+    }
+
+    if ( $this->_requestType == 'rest'){
+      $this->_response->setContentType('json');
+      try{
+        call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
+        $content = ob_get_clean();
+        $this->_response->addBodyPart($content);
+      }catch(\nf\Error\HttpException $he){
+
+        $this->_response->clearBody();
+        $this->_response->setHttpResponseCode($he->getHttpStatus());
+        if ( method_exists($he, 'getErrors')){
+          $this->_response->addBodyPart(json_encode($he->getErrors()));
         }
-		call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
-		$content = ob_get_clean();
-		$this->_response->addBodyPart($content);
-	}
+      }
+    }else{
+      call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
+      $content = ob_get_clean();
+      $this->_response->addBodyPart($content);
+    }
+  }
 
 	public static function cleanOutputBuffer() {
 		// Clean output buffer on error

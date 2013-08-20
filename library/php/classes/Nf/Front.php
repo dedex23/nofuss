@@ -448,7 +448,7 @@ class Front extends Singleton {
         call_user_func(array($this->_controllerInstance, $this->_actionName . 'Action'), null);
         $content = ob_get_clean();
         $this->_response->addBodyPart($content);
-      }catch(\nf\Error\HttpException $he){
+      }catch(\nf\Error\Exception\Http $he){
 
         $this->_response->clearBody();
         $this->_response->setHttpResponseCode($he->getHttpStatus());

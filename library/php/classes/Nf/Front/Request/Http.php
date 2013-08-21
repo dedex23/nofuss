@@ -94,6 +94,16 @@ class Http extends AbstractRequest
 		}
 	}
 
+	public function getPost($jsonDecode='assoc') {
+		$post = '';
+		if($_SERVER['REQUEST_METHOD'] == 'POST')
+			$post = file_get_contents("php://input");
+
+		if($jsonDecode=='assoc')
+			return json_decode($post, true);
+		else
+			return $post;
+	}
 
 	public function getPut($jsonDecode='assoc') {
 		if($jsonDecode=='assoc') {

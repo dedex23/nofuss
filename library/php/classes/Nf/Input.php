@@ -201,11 +201,16 @@ class Input
 					// we will search for the function name in this class
 					$methodNameForOption=$metaAction . ucfirst($optionFunction);
 					if(in_array($methodNameForOption, $this->_classMethods)) {
-						if(isset($optionParameter)) {
-							$ret=self::$methodNameForOption($this->_fields[$paramName]['value'], $optionParameter, $this);
+						if($metaAction=='validate' && $optionName==self::V_REQUIRED) {
+							$ret=isset($this->_fields[$paramName]);
 						}
 						else {
-							$ret=self::$methodNameForOption($this->_fields[$paramName]['value'], null, $this);
+							if(isset($optionParameter)) {
+								$ret=self::$methodNameForOption($this->_fields[$paramName]['value'], $optionParameter, $this);
+							}
+							else {
+								$ret=self::$methodNameForOption($this->_fields[$paramName]['value'], null, $this);
+							}
 						}
 						if($metaAction=='filter') {
 							$this->setField($paramName, $ret);
@@ -353,7 +358,7 @@ class Input
 	// ************************************************************************
 
 	public static function validateInt($value){
-		return (bool)preg_match(self::REGEXP_INT, $value);
+		return (self::filterInt($value)==$value);
 	}
 
 	public static function validateNatural($value) {

@@ -17,6 +17,7 @@ class Input
 	const F_TRIM='trim';
 	const F_URL='url';
 	const F_STRIPTAGS='stripTags';
+	const F_NULL='nullIfEmptyString';
 
 	const V_INTEGER='int';
 	const V_NATURAL='natural';
@@ -115,17 +116,16 @@ class Input
 			$isValid=true;
 		}
 
-    foreach($metaSource as $paramName=>$options) {
+    	foreach($metaSource as $paramName=>$options) {
 
 			if($metaAction=='filter') {
 				$this->setField($paramName, (isset($this->_params[$paramName]) ? $this->_params[$paramName] : null));
 			}
-			if($metaAction=='validate') {
 
+			if($metaAction=='validate') {
 				if(!isset($this->_fields[$paramName])) {
 					$this->setField($paramName, (isset($this->_params[$paramName]) ? $this->_params[$paramName] : null));
 				}
-
 				$validatorIndex=0;
 				$validators=array();
 			}
@@ -191,9 +191,9 @@ class Input
 						}
 						else {
 							$ret=$className::$methodName($this->_fields[$paramName]['value'], null, $this);
-            }
+            			}
 						// add the validator to the validators for this field
-            $isValid=$isValid && $ret;
+            			$isValid=$isValid && $ret;
 						$validators[$optionName]=$ret;
 					}
 				}
@@ -224,21 +224,21 @@ class Input
 					else {
 						throw new \Exception (__CLASS__ . ' hasn\'t a method called "' . $methodNameForOption . '"');
 					}
-        }
+        		}
 			}
 			unset($option);
 
 			// we set the field after all the input value went through all validators
-      if($metaAction=='validate' && $validatorIndex==count($options)) {
+  			if($metaAction=='validate' && $validatorIndex==count($options)) {
 
-        // we test for each params if one of validators is not valid.
-        $paramIsValid = true;
-        foreach($validators as $v){
-          if ( $v === false){
-            $paramIsValid = false;
-            break;
-          }
-        }
+		        // we test for each params if one of validators is not valid.
+		        $paramIsValid = true;
+		        foreach($validators as $v){
+		        	if ( $v === false){
+		            	$paramIsValid = false;
+		            	break;
+		          	}
+		        }
 				$this->setField($paramName, false, $paramIsValid, $validators);
 			}
 		}
@@ -283,26 +283,26 @@ class Input
 
 	// ************************************************************************
 	// filter functions
-  // ************************************************************************
+	// ************************************************************************
 
- // used for int as string 
-  public static function filterNull($value){
-    if ( $value == '') return null;
-    return $value;
-  }
+ 	// used for int as string in json data
+	public static function filterNullIfEmptyString($value){
+		if ($value == '') return null;
+    	return $value;
+  	}
 
 	public static function filterInt($value) {
-    return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-    if ( $d == '')
-      return null;
-    return (int)$d;
+	    return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+	    if ( $d == '')
+	  		return null;
+	    return (int)$d;
 	}
 
 	public static function filterNatural($value) {
 		return abs(self::filterInt($value));
 	}
 
-  public static function filterNaturalNonZero($value) {
+  	public static function filterNaturalNonZero($value) {
 		$natural=self::filterNatural($value);
 		if($natural!=0) {
 			return $natural;

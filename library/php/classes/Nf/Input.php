@@ -5,41 +5,42 @@ namespace Nf;
 class Input
 {
 
-	const F_INTEGER='int';
-	const F_NATURAL='natural';
-	const F_NATURALNONZERO='naturalNonZero';
-	const F_ALPHA='alpha';
-	const F_ALPHANUM='alphaNum';
-	const F_NUMERIC='numeric';
-	const F_BASE64='base64';
-	const F_REGEXP='regexp';
-	const F_STRING='string';
-	const F_TRIM='trim';
-	const F_URL='url';
-	const F_STRIPTAGS='stripTags';
-	const F_NULL='nullIfEmptyString';
+	const F_INTEGER='Int';
+	const F_NATURAL='Natural';
+	const F_NATURALNONZERO='NaturalNonZero';
+	const F_ALPHA='Alpha';
+	const F_ALPHANUM='AlphaNum';
+	const F_NUMERIC='Numeric';
+	const F_BASE64='Base64';
+	const F_REGEXP='Regexp';
+	const F_STRING='String';
+	const F_TRIM='Trim';
+	const F_URL='Url';
+	const F_STRIPTAGS='StripTags';
+	const F_NULL='NullIfEmptyString';
+	const F_BOOLEAN='Boolean';
 
-	const V_INTEGER='int';
-	const V_NATURAL='natural';
-	const V_NATURALNONZERO='naturalNonZero';
-	const V_ALPHA='alpha';
-	const V_ALPHANUM='alphaNum';
-	const V_NUMERIC='numeric';
-	const V_BASE64='base64';
-	const V_EQUALS='equals';
-	const V_REGEXP='regexp';
-	const V_REQUIRED='required';
-	const V_NOTEMPTY='notEmpty';
-	const V_GREATERTHAN='greaterThan';
-	const V_LESSTHAN='lessThan';
-	const V_MINLENGTH='minLength';
-	const V_MAXLENGTH='maxLength';
-	const V_EXACTLENGTH='exactLength';
-	const V_EMAIL='email';
-	const V_MATCHES='matches';
-	const V_URL='url';
-	const V_DEFAULT='default';
-
+	const V_INTEGER='Int';
+	const V_NATURAL='Natural';
+	const V_NATURALNONZERO='NaturalNonZero';
+	const V_ALPHA='Alpha';
+	const V_ALPHANUM='AlphaNum';
+	const V_NUMERIC='Numeric';
+	const V_BASE64='Base64';
+	const V_EQUALS='Equals';
+	const V_REGEXP='Regexp';
+	const V_REQUIRED='Required';
+	const V_NOTEMPTY='NotEmpty';
+	const V_GREATERTHAN='GreaterThan';
+	const V_LESSTHAN='LessThan';
+	const V_MINLENGTH='MinLength';
+	const V_MAXLENGTH='MaxLength';
+	const V_EXACTLENGTH='ExactLength';
+	const V_EMAIL='Email';
+	const V_MATCHES='Matches';
+	const V_URL='Url';
+	const V_DEFAULT='Default';
+	const V_BOOLEAN='Boolean';
 
 	private $_params=array();
 	private $_filters=array();
@@ -57,6 +58,8 @@ class Input
 		$this->_filters=$filters;
 		$this->_validators=$validators;
 		$this->_classMethods = get_class_methods(__CLASS__);
+		$refl = new \ReflectionClass(__CLASS__);
+		$this->_classConstants = $refl->getConstants();
 	}
 
 	public function isValid() {
@@ -170,7 +173,6 @@ class Input
 					$optionFunction=$option;
 				}
 
-				// echo 'option=' . $optionFunction . '<br>';
 				// if we want to validate against a method of a model
 				$idx=strpos($optionFunction, '::');
 				if($idx!==false) {
@@ -200,16 +202,39 @@ class Input
 				else {
 					// we will search for the function name in this class
 					$methodNameForOption=$metaAction . ucfirst($optionFunction);
+					// if the developer has used a shortname for the filter/validator
+					$methodNameFromConstants = (($metaAction=='filter')?'F':'V') . '_' . strtoupper($optionFunction);
+					if(isset($this->_classConstants[$methodNameFromConstants])) {
+						$methodNameForOption = (($metaAction=='filter')?'filter':'validate') . $this->_classConstants[$methodNameFromConstants];
+					}
 					if(in_array($methodNameForOption, $this->_classMethods)) {
-						if($metaAction=='validate' && $optionName==self::V_REQUIRED) {
+						if($metaAction=='validate' && $methodNameForOption=='validateRequired') {
 							$ret=isset($this->_fields[$paramName]);
 						}
 						else {
-							if(isset($optionParameter)) {
-								$ret=self::$methodNameForOption($this->_fields[$paramName]['value'], $optionParameter, $this);
+							if(!isset($optionParameter)) {
+								$optionParameter=null;
+							}
+							if(is_array($this->_fields[$paramName]['value'])) {
+								if($metaAction=='filter') {
+									foreach($this->_fields[$paramName]['value'] as $paramKey => $paramValue) {
+										$this->_fields[$paramName]['value'][$paramKey]=self::$methodNameForOption($this->_fields[$paramName]['value'][$paramKey], $optionParameter, $this);
+									}
+									unset($paramKey);
+									unset($paramValue);
+									$ret=$this->_fields[$paramName]['value'];
+								}
+								else {
+									$ret=true;
+									foreach($this->_fields[$paramName]['value'] as $paramKey => $paramValue) {
+										$ret&=self::$methodNameForOption($this->_fields[$paramName]['value'][$paramKey], $optionParameter, $this);
+									}
+									unset($paramKey);
+									unset($paramValue);
+								}
 							}
 							else {
-								$ret=self::$methodNameForOption($this->_fields[$paramName]['value'], null, $this);
+								$ret=self::$methodNameForOption($this->_fields[$paramName]['value'], $optionParameter, $this);
 							}
 						}
 						if($metaAction=='filter') {
@@ -298,7 +323,7 @@ class Input
 
 	public static function filterInt($value) {
 	    return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-	    if ( $d == '')
+	    if ($d == '')
 	  		return null;
 	    return (int)$d;
 	}
@@ -327,6 +352,11 @@ class Input
 
 	public static function filterBase64($value) {
 		return preg_replace(self::REGEXP_BASE64, '', $value);
+	}
+
+	public static function filterBoolean($value) {
+		$out = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+		return $out;
 	}
 
 	public static function filterNumeric($value) {
@@ -379,6 +409,10 @@ class Input
 
 	public static function validateBase64($value) {
 		return (bool)preg_match(self::REGEXP_BASE64, $value);
+	}
+
+	public static function validateBoolean($value) {
+		return (self::filterBoolean($value)==$value);
 	}
 
 	public static function validateNumeric($value) {

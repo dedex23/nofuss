@@ -134,6 +134,7 @@ class Input
 			}
 
 			$options=(array)$options;
+
 			foreach($options as $option) {
 
 				if($metaAction=='validate') {
@@ -145,6 +146,7 @@ class Input
 				unset($optionParameter);
 
 				if(is_array($option)) {
+
 					$optionKeys=array_keys($option);
 					$optionValues=array_values($option);
 
@@ -156,10 +158,21 @@ class Input
 					}
 					elseif($this->isAssoc($option)) {
 						// call with an alias only : array('isValidId' => '\App\Toto::validateId'),
+						// or (if your name is Olivier D) call with the parameter as assoc : array('default' => 7),
 						$optionKeys=array_keys($option);
 						$optionValues=array_values($option);
-						$optionName=$optionKeys[0];
-						$optionFunction=$optionValues[0];
+
+						// if the value of the array is a function
+						if(isset($$optionFunction)) {
+							$optionName=$optionKeys[0];
+							$optionFunction=$optionValues[0];
+						}
+						// if the value of the array is a function (à la Olivier D)
+						else {
+							$optionName=$optionKeys[0];
+							$optionFunction=$optionKeys[0];
+							$optionParameter=$optionValues[0];
+						}
 					}
 					else {
 						// call with a parameter only : array('regexp', '/[a-z]*/i')
@@ -200,6 +213,7 @@ class Input
 					}
 				}
 				else {
+
 					// we will search for the function name in this class
 					$methodNameForOption=$metaAction . ucfirst($optionFunction);
 					// if the developer has used a shortname for the filter/validator
@@ -207,8 +221,9 @@ class Input
 					if(isset($this->_classConstants[$methodNameFromConstants])) {
 						$methodNameForOption = (($metaAction=='filter')?'filter':'validate') . $this->_classConstants[$methodNameFromConstants];
 					}
+
 					if(in_array($methodNameForOption, $this->_classMethods)) {
-						if($metaAction=='validate' && $methodNameForOption=='validateRequired') {
+						if($methodNameForOption=='validateRequired') {
 							$ret=isset($this->_fields[$paramName]);
 						}
 						else {
@@ -243,9 +258,23 @@ class Input
 						// add the validator to the validators for this field
 						if($metaAction=='validate') {
 							// special case of the default value
-							if($optionName==self::V_DEFAULT) {
-								$this->_fields[$paramName]['value']=$ret;
-								$ret=true;
+							if($methodNameForOption=='validateDefault') {
+								if(is_array($this->_fields[$paramName]['value'])) {
+									foreach($this->_fields[$paramName]['value'] as $paramKey => $paramValue) {
+										if(empty($this->_fields[$paramName]['value'][$paramKey])) {
+											$this->_fields[$paramName]['value'][$paramKey]=$optionParameter;
+										}
+									}
+									unset($paramKey);
+									unset($paramValue);
+									$ret=true;
+								}
+								else {
+									if(empty($this->_fields[$paramName]['value'])) {
+										$this->_fields[$paramName]['value']=$optionParameter;
+									}
+									$ret=true;
+								}
 							}
 							$isValid=$isValid && $ret;
 							$validators[$optionName]=$ret;

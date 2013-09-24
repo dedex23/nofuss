@@ -352,9 +352,6 @@ class Input
 
 	public static function filterInt($value) {
 	    return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-	    if ($d == '')
-	  		return null;
-	    return (int)$d;
 	}
 
 	public static function filterNatural($value) {

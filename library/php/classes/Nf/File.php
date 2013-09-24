@@ -29,10 +29,14 @@ abstract class File
 		$mimeType = finfo_file($finfo, $src);
 		finfo_close($finfo);
 
+		// @todo manage others filetype
 		switch($mimeType) {
 			case 'application/x-gzip':
 				exec('gzip -dcf ' . $src . ($dest!==null ? ' > '.$dest : ''), $out, $ret);
 				break;
+
+			default:
+				return false;
 		}
 
 		if(isset($ret) && $ret===0) {
